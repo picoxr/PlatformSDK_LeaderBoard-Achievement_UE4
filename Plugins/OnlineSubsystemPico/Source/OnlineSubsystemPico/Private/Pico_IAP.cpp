@@ -16,7 +16,7 @@ bool UOnlinePicoIAPFunction::ConsumePurchase(UObject* WorldContextObject, const 
     UE_LOG(PicoIAP, Log, TEXT("UOnlinePicoIAPFunction::ConsumePurchase"));
     FOnlineSubsystemPico* Subsystem = static_cast<FOnlineSubsystemPico*>(Online::GetSubsystem(GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull), PICO_SUBSYSTEM));
     if (Subsystem && Subsystem->GetPicoIAPInterface())
-    {   
+    {
         return Subsystem->GetPicoIAPInterface()->ConsumePurchase(SKU, InConsumePurchaseDelegate);
     }
     return false;
@@ -80,7 +80,6 @@ bool UOnlinePicoIAPFunction::LaunchCheckoutFlow(UObject* WorldContextObject, con
 bool FPicoIAPInterface::ConsumePurchase(const FString& SKU, FConsumePurchaseDelegate InConsumePurchaseDelegate)
 {
     UE_LOG(PicoIAP, Log, TEXT("FPicoIAPInterface::ConsumePurchase"));
-#if PLATFORM_ANDROID
     ppfRequest RequestId = ppf_IAP_ConsumePurchase(TCHAR_TO_UTF8(*SKU));
     PicoSubsystem.AddAsyncTask(RequestId, FPicoMessageOnCompleteDelegate::CreateLambda(
         [InConsumePurchaseDelegate, this](ppfMessageHandle Message, bool bIsError)
@@ -101,14 +100,11 @@ bool FPicoIAPInterface::ConsumePurchase(const FString& SKU, FConsumePurchaseDele
             }
         }));
     return true;
-#endif
-    return false;
 }
 
 bool FPicoIAPInterface::GetProductsBySKU(TArray<FString> ProductSKUs, int32 Count, FGetProductsBySKUDelegate InGetProductsBySKUDelegate)
 {
     UE_LOG(PicoIAP, Log, TEXT("FPicoIAPInterface::GetProductsBySKU"));
-#if PLATFORM_ANDROID
     //char* SKUsArray = NULL;
     //SKUsArray = new char[ProductSKUs.Num()];
     //for (size_t i = 0; i < ProductSKUs.Num(); i++)
@@ -153,14 +149,11 @@ bool FPicoIAPInterface::GetProductsBySKU(TArray<FString> ProductSKUs, int32 Coun
             }
         }));
     return true;
-#endif
-    return false;
 }
 
 bool FPicoIAPInterface::GetNextProductsArrayPage(UPico_ProductArray* InProductArray, FGetNextProductArrayPageDelegate InGetNextProductArrayPageDelegate)
 {
     UE_LOG(PicoIAP, Log, TEXT("FPicoIAPInterface::GetNextProductsArrayPage"));
-#if PLATFORM_ANDROID
     ppfRequest RequestId = ppf_IAP_GetNextProductArrayPage(TCHAR_TO_UTF8(*InProductArray->GetNextPageParam()));
     PicoSubsystem.AddAsyncTask(RequestId, FPicoMessageOnCompleteDelegate::CreateLambda(
         [InGetNextProductArrayPageDelegate, this](ppfMessageHandle Message, bool bIsError)
@@ -183,14 +176,11 @@ bool FPicoIAPInterface::GetNextProductsArrayPage(UPico_ProductArray* InProductAr
             }
         }));
     return true;
-#endif
-    return false;
 }
 
 bool FPicoIAPInterface::GetViewerPurchases(FGetViewerPurchasesDelegate InGetViewerPurchasesDelegate)
 {
     UE_LOG(PicoIAP, Log, TEXT("FPicoIAPInterface::GetViewerPurchases"));
-#if PLATFORM_ANDROID
     ppfRequest RequestId = ppf_IAP_GetViewerPurchases();
     PicoSubsystem.AddAsyncTask(RequestId, FPicoMessageOnCompleteDelegate::CreateLambda(
         [InGetViewerPurchasesDelegate, this](ppfMessageHandle Message, bool bIsError)
@@ -213,14 +203,11 @@ bool FPicoIAPInterface::GetViewerPurchases(FGetViewerPurchasesDelegate InGetView
             }
         }));
     return true;
-#endif
-    return false;
 }
 
 bool FPicoIAPInterface::GetNextPurchaseArrayPage(UPico_PurchaseArray* InPurchaseArray, FGetNextPurchaseArrayPageDelegate InGetNextPurchaseArrayPageDelegate)
 {
     UE_LOG(PicoIAP, Log, TEXT("FPicoIAPInterface::GetNextPurchaseArrayPage"));
-#if PLATFORM_ANDROID
     ppfRequest RequestId = ppf_IAP_GetNextPurchaseArrayPage(TCHAR_TO_UTF8(*InPurchaseArray->GetNextPageParam()));
     PicoSubsystem.AddAsyncTask(RequestId, FPicoMessageOnCompleteDelegate::CreateLambda(
         [InGetNextPurchaseArrayPageDelegate, this](ppfMessageHandle Message, bool bIsError)
@@ -243,14 +230,11 @@ bool FPicoIAPInterface::GetNextPurchaseArrayPage(UPico_PurchaseArray* InPurchase
             }
         }));
     return true;
-#endif
-    return false;
 }
 
 bool FPicoIAPInterface::LaunchCheckoutFlow(const FString& SKU, const FString& Price, const FString& Currency, FLaunchCheckoutFlowDelegate InLaunchCheckoutFlowDelegate)
 {
     UE_LOG(PicoIAP, Log, TEXT("FPicoIAPInterface::LaunchCheckoutFlow"));
-#if PLATFORM_ANDROID
     ppfRequest RequestId = ppf_IAP_LaunchCheckoutFlow(TCHAR_TO_UTF8(*SKU), TCHAR_TO_UTF8(*Price), TCHAR_TO_UTF8(*Currency));
     PicoSubsystem.AddAsyncTask(RequestId, FPicoMessageOnCompleteDelegate::CreateLambda(
         [InLaunchCheckoutFlowDelegate, this](ppfMessageHandle Message, bool bIsError)
@@ -262,7 +246,7 @@ bool FPicoIAPInterface::LaunchCheckoutFlow(const FString& SKU, const FString& Pr
                 UE_LOG(PicoIAP, Log, TEXT("LaunchCheckoutFlow return failed:%s"), *ErrorMessage);
                 this->LaunchCheckoutFlowDelegate.ExecuteIfBound(true, ErrorMessage, nullptr);
                 InLaunchCheckoutFlowDelegate.ExecuteIfBound(true, ErrorMessage, nullptr);
-        }
+            }
             else
             {
                 UE_LOG(PicoIAP, Log, TEXT("LaunchCheckoutFlow Successfully"));
@@ -271,23 +255,19 @@ bool FPicoIAPInterface::LaunchCheckoutFlow(const FString& SKU, const FString& Pr
                 this->LaunchCheckoutFlowDelegate.ExecuteIfBound(false, FString(), Pico_Purchase);
                 InLaunchCheckoutFlowDelegate.ExecuteIfBound(false, FString(), Pico_Purchase);
             }
-}));
+        }));
     return true;
-#endif
-    return false;
 }
 
 void UPico_Product::InitParams(ppfProduct* InppfProductHandle)
 {
     UE_LOG(PicoIAP, Log, TEXT("UPico_Product::InitParams"));
-#if PLATFORM_ANDROID
     Description = UTF8_TO_TCHAR(ppf_Product_GetDescription(InppfProductHandle));
     FormattedPrice = UTF8_TO_TCHAR(ppf_Product_GetFormattedPrice(InppfProductHandle));
     Price = UTF8_TO_TCHAR(ppf_Product_GetPrice(InppfProductHandle));
     Currency = UTF8_TO_TCHAR(ppf_Product_GetCurrency(InppfProductHandle));
     Name = UTF8_TO_TCHAR(ppf_Product_GetName(InppfProductHandle));
     SKU = UTF8_TO_TCHAR(ppf_Product_GetSKU(InppfProductHandle));
-#endif
 }
 
 FString UPico_Product::GetDescription()
@@ -323,7 +303,6 @@ FString UPico_Product::GetSKU()
 void UPico_ProductArray::InitParams(ppfProductArray* InppfProductArrayHandle)
 {
     UE_LOG(PicoIAP, Log, TEXT("UPico_ProductArray::InitParams"));
-#if PLATFORM_ANDROID
     Size = ppf_ProductArray_GetSize(InppfProductArrayHandle);
     for (int32 i = 0; i < Size; i++)
     {
@@ -336,7 +315,6 @@ void UPico_ProductArray::InitParams(ppfProductArray* InppfProductArrayHandle)
     {
         NextPageParam = ppf_ProductArray_GetNextPageParam(InppfProductArrayHandle);
     }
-#endif
 }
 
 UPico_Product* UPico_ProductArray::GetElement(int32 Index)
@@ -366,20 +344,18 @@ bool UPico_ProductArray::HasNextPage()
 void UPico_Purchase::InitParams(ppfPurchase* InppfPurchaseHandle)
 {
     UE_LOG(PicoIAP, Log, TEXT("UPico_Purchase::InitParams"));
-#if PLATFORM_ANDROID
     ExpirationTime = ppf_Purchase_GetExpirationTime(InppfPurchaseHandle);
     GrantTime = ppf_Purchase_GetGrantTime(InppfPurchaseHandle);
     ID = ppf_Purchase_GetID(InppfPurchaseHandle);
     SKU = ppf_Purchase_GetSKU(InppfPurchaseHandle);
-#endif
 }
 
-int32 UPico_Purchase::GetExpirationTime()
+int64 UPico_Purchase::GetExpirationTime()
 {
     return ExpirationTime;
 }
 
-int32 UPico_Purchase::GetGrantTime()
+int64 UPico_Purchase::GetGrantTime()
 {
     return GrantTime;
 }
@@ -397,7 +373,6 @@ FString UPico_Purchase::GetSKU()
 void UPico_PurchaseArray::InitParams(ppfPurchaseArray* InppfPurchaseArrayHandle)
 {
     UE_LOG(PicoIAP, Log, TEXT("UPico_PurchaseArray::InitParams"));
-#if PLATFORM_ANDROID
     Size = ppf_PurchaseArray_GetSize(InppfPurchaseArrayHandle);
     for (int32 i = 0; i < Size; i++)
     {
@@ -406,12 +381,10 @@ void UPico_PurchaseArray::InitParams(ppfPurchaseArray* InppfPurchaseArrayHandle)
         PurchaseArray.Add(ThisElement);
     }
     bHasNextPage = ppf_PurchaseArray_HasNextPage(InppfPurchaseArrayHandle);
-
     if (bHasNextPage)
     {
         NextPageParam = ppf_PurchaseArray_GetNextPageParam(InppfPurchaseArrayHandle);
     }
-#endif
 }
 
 UPico_Purchase* UPico_PurchaseArray::GetElement(int32 Index)
@@ -441,7 +414,7 @@ bool UPico_PurchaseArray::HasNextPage()
 FPicoIAPInterface::FPicoIAPInterface(FOnlineSubsystemPico& InSubsystem) :
     PicoSubsystem(InSubsystem)
 {
-    
+
 }
 
 FPicoIAPInterface::~FPicoIAPInterface()

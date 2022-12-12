@@ -526,8 +526,13 @@ int Pxr_GetHandTrackingMesh(PxrMeshType HandtrackMeshType,PxrHandMesh * Handtrac
 int Pxr_GetHandTrackerSettingState(bool * enable);
 int Pxr_GetHandTrackerActiveInputType(PxrActiveInputDeviceType * ActiveInputType);
 int Pxr_GetHandTrackerJointLocations(int hand,PxrHandJointsLocations * JointsLocations);
-int Pxr_GetHandTrackerJointLocationsWithPredictTime(int hand,double predictTime,PxrHandJointsLocations * JointsLocations);
 int Pxr_GetHandTrackerAimState(int hand,PxrHandAimState * aimstate);
+
+int Pxr_GetHandTrackerJointLocationsWithPT(int hand,double predictTime,PxrHandJointsLocations * JointsLocations);
+int Pxr_GetHandTrackerAimStateWithPT(int hand,double predictTime,PxrHandAimState * aimstate);
+
+int Pxr_GetHandTrackerJointLocationsWithPTFG(int hand,double predictTime,PxrHandJointsLocations * JointsLocations);
+int Pxr_GetHandTrackerAimStateWithPTFG(int hand,double predictTime,PxrHandAimState * aimstate);
 /*******************************************************************************************************************************************************************
 *
 *                                                 Main Hand Feature Function

@@ -12,13 +12,12 @@ const FString FOnlineFriendsPico::FriendsListInviteableUsers = TEXT("invitableUs
 void FOnlineFriendsPico::OnQueryFriendsComplete(ppfMessageHandle Message, bool bIsError, int32 LocalUserNum, const FString& ListName, TMap<FString, TSharedRef<FOnlineFriend>>& OutList, bool bAppendToExistingMap, const FOnReadFriendsListComplete& Delegate)
 {
     UE_LOG_ONLINE_FRIEND(Log, TEXT("PPF_GAME FOnlineFriendsPico::On Query Friends Complete Recive!"));
-#if PLATFORM_ANDROID
     FString ErrorStr;
     if (bIsError)
     {
         auto Error = ppf_Message_GetError(Message);
         auto ErrorMessage = ppf_Error_GetMessage(Error);
-		FString ErrorMessageStr = UTF8_TO_TCHAR(ErrorMessage);
+        FString ErrorMessageStr = UTF8_TO_TCHAR(ErrorMessage);
         UE_LOG_ONLINE_FRIEND(Log, TEXT("PPF_GAME FOnlineFriendsPico::On Query Friends Complete Recive Failed :%s"), *ErrorMessageStr);
         ErrorStr = UTF8_TO_TCHAR(ErrorMessage);
         if (bAppendToExistingMap)
@@ -56,8 +55,8 @@ void FOnlineFriendsPico::OnQueryFriendsComplete(ppfMessageHandle Message, bool b
         auto FriendPresenceStatus = ppf_User_GetPresenceStatus(Friend);
         FString PresenceExtra = ppf_User_GetPresenceExtra(Friend);
         TSharedRef<FOnlinePicoFriend> OnlineFriend(new FOnlinePicoFriend(FriendId, FriendDisplayName, FriendPresenceStatus, FriendInviteTokenString,
-             ImageUrl, Gender, SmallImageUrl, PresencePackage, Presence, PresenceDeeplinkMessage, PresenceDestinationApiName, PresenceLobbySessionId,
-             PresenceMatchSessionId, PresenceExtra));
+            ImageUrl, Gender, SmallImageUrl, PresencePackage, Presence, PresenceDeeplinkMessage, PresenceDestinationApiName, PresenceLobbySessionId,
+            PresenceMatchSessionId, PresenceExtra));
 
         UE_LOG_ONLINE(Display, TEXT("PPF_GAME add friend in outlist: FriendId: %s, DisplayName: %s, InviteToken: %s"), *FriendId, *FriendDisplayName, *FriendInviteTokenString);
         OutList.Add(FriendId, OnlineFriend);
@@ -82,7 +81,6 @@ void FOnlineFriendsPico::OnQueryFriendsComplete(ppfMessageHandle Message, bool b
     {
         Delegate.ExecuteIfBound(LocalUserNum, true, ListName, ErrorStr);
     }
-#endif
 }
 
 FOnlineFriendsPico::FOnlineFriendsPico(FOnlineSubsystemPico& InSubsystem)
@@ -94,7 +92,6 @@ FOnlineFriendsPico::FOnlineFriendsPico(FOnlineSubsystemPico& InSubsystem)
 bool FOnlineFriendsPico::ReadFriendsList(int32 LocalUserNum, const FString& ListName, const FOnReadFriendsListComplete& Delegate /*= FOnReadFriendsListComplete()*/)
 {
     UE_LOG_ONLINE_FRIEND(Log, TEXT("FOnlineFriendsPico::ReadFriendsList!"));
-#if PLATFORM_ANDROID
     if (ListName == EFriendsLists::ToString(EFriendsLists::Default) || ListName == EFriendsLists::ToString(EFriendsLists::OnlinePlayers))
     {
         PicoSubsystem.AddAsyncTask
@@ -112,24 +109,8 @@ bool FOnlineFriendsPico::ReadFriendsList(int32 LocalUserNum, const FString& List
     }
     if (ListName == FriendsListInviteableUsers)
     {
-        //PicoSubsystem.AddAsyncTask
-        //(
-        //    ppf_Room_GetInvitableUsers2(nullptr),
-        //    FPicoMessageOnCompleteDelegate::CreateLambda
-        //    (
-        //        [this, LocalUserNum, ListName, Delegate](ppfMessageHandle Message, bool bIsError)
-        //        {
-        //            OnQueryFriendsComplete(Message, bIsError, LocalUserNum, ListName, InvitableUsers, /* bAppendToExistingMap */ false, Delegate);
-        //        }
-        //    )
-        //);
         return false;
     }
-
-
-
-
-#endif
     Delegate.ExecuteIfBound(LocalUserNum, false, ListName, TEXT("Invalid friends list"));
     return false;
 
@@ -137,8 +118,6 @@ bool FOnlineFriendsPico::ReadFriendsList(int32 LocalUserNum, const FString& List
 
 bool FOnlineFriendsPico::ReadFriendsList(int32 LocalUserNum, const FString& ListName, ppfID RoomId, const FOnReadFriendsListComplete& Delegate /*= FOnReadFriendsListComplete()*/)
 {
-#if PLATFORM_ANDROID
-    
     if (ListName == FriendsListInviteableUsers)
     {
         auto RoomOptions = ppf_RoomOptions_Create();
@@ -158,8 +137,6 @@ bool FOnlineFriendsPico::ReadFriendsList(int32 LocalUserNum, const FString& List
         ppf_RoomOptions_Destroy(RoomOptions);
         return true;
     }
-
-#endif
     Delegate.ExecuteIfBound(LocalUserNum, false, ListName, TEXT("List invaild, Invitablelist only."));
     return false;
 }
@@ -174,7 +151,7 @@ bool FOnlineFriendsPico::DeleteFriendsList(int32 LocalUserNum, const FString& Li
 bool FOnlineFriendsPico::SendInvite(int32 LocalUserNum, const FUniqueNetId& FriendId, const FString& ListName, const FOnSendInviteComplete& Delegate /*= FOnSendInviteComplete()*/)
 {
     // Not Supported
-	Delegate.ExecuteIfBound(LocalUserNum, false, FriendId, ListName, TEXT("Not implemented"));
+    Delegate.ExecuteIfBound(LocalUserNum, false, FriendId, ListName, TEXT("Not implemented"));
     return false;
 }
 

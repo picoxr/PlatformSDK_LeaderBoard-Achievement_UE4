@@ -77,6 +77,9 @@
 #include "PPF_AchievementDefinitionArray.h"
 #include "PPF_AchievementProgressArray.h"
 #include "PPF_AchievementUpdate.h"
+#include "PPF_Challenge.h"
+#include "PPF_ChallengeArray.h"
+#include "PPF_ChallengeEntryArray.h"
 #include "PPF_PurchaseArray.h"
 #include "PPF_ProductArray.h"
 #include "PPF_Purchase.h"
@@ -175,6 +178,9 @@ PPF_PUBLIC_FUNCTION(ppfLeaderboardEntryArrayHandle)              ppf_Message_Get
 PPF_PUBLIC_FUNCTION(ppfAchievementDefinitionArrayHandle)         ppf_Message_GetAchievementDefinitionArray(const ppfMessageHandle obj);
 PPF_PUBLIC_FUNCTION(ppfAchievementProgressArrayHandle)           ppf_Message_GetAchievementProgressArray(const ppfMessageHandle obj);
 PPF_PUBLIC_FUNCTION(ppfAchievementUpdateHandle)                  ppf_Message_GetAchievementUpdate(const ppfMessageHandle obj);
+PPF_PUBLIC_FUNCTION(ppfChallengeHandle)                          ppf_Message_GetChallenge(const ppfMessageHandle obj);
+PPF_PUBLIC_FUNCTION(ppfChallengeArrayHandle)                     ppf_Message_GetChallengeArray(const ppfMessageHandle obj);
+PPF_PUBLIC_FUNCTION(ppfChallengeEntryArrayHandle)                ppf_Message_GetChallengeEntryArray(const ppfMessageHandle obj);
 
 PPF_PUBLIC_FUNCTION(ppfPurchaseArrayHandle) ppf_Message_GetPurchaseArray(const ppfMessageHandle obj);
 PPF_PUBLIC_FUNCTION(ppfProductArrayHandle) ppf_Message_GetProductArray(const ppfMessageHandle obj);

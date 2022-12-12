@@ -25,6 +25,7 @@ public:
 		struct
 		{
 			uint64			bSplashIsShown : 1;
+			uint64			bLateUpdateOK : 1;
 		};
 		uint64 Raw;
 	} Flags;

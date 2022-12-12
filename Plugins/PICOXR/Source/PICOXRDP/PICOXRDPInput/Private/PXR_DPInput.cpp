@@ -71,6 +71,7 @@ void FPICOXRDPInput::SendControllerEvents()
 
 void FPICOXRDPInput::AddSampleInputs()
 {
+#if WITH_EDITOR
     // Get Existing Input Settings
 	auto DefaultInputSettings = GetDefault<UInputSettings>();
 	TArray<FInputAxisKeyMapping> ExistingAxisKeys = DefaultInputSettings->GetAxisMappings();
@@ -105,10 +106,12 @@ void FPICOXRDPInput::AddSampleInputs()
 		InputSettings->SaveKeyMappings();
 		InputSettings->UpdateDefaultConfigFile();
 	}
+#endif
 }
 
 void FPICOXRDPInput::ClearSampleInputs()
 {
+#if WITH_EDITOR
 	auto DefaultInputSettings = GetDefault<UInputSettings>();
 	TArray<FInputAxisKeyMapping> ExistingAxisKeys = DefaultInputSettings->GetAxisMappings();
 	TArray<FInputActionKeyMapping> ExistingActionKeys = DefaultInputSettings->GetActionMappings();
@@ -141,7 +144,7 @@ void FPICOXRDPInput::ClearSampleInputs()
 		InputSettings->SaveKeyMappings();
 		InputSettings->UpdateDefaultConfigFile();
 	}
-	
+#endif
 }
 
 bool FPICOXRDPInput::AddNewSampleAxisMapping(TArray<FInputAxisKeyMapping> ExistingAxisKeys, UInputSettings* InputSettings, FName ActionName, FKey ActionKey)

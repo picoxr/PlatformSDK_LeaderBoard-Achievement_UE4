@@ -7,6 +7,7 @@
 #include "CoreMinimal.h"
 #include "PPF_Platform.h"
 #include "OnlineAsyncTaskManager.h"
+#include "OnlineSubsystemPicoNames.h"
 
 DECLARE_DELEGATE_TwoParams(FPicoMessageOnCompleteDelegate, ppfMessageHandle, bool /*bIsTimeOut or bIsError*/);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FPicoMulticastMessageOnCompleteDelegate, ppfMessageHandle, bool);
@@ -36,27 +37,27 @@ public:
     virtual ~FOnlineAsyncTaskPico()
     {
     }
-	/**
-	 *	Get a human readable description of task
-	 */
-	virtual FString ToString() const override;
+    /**
+     *	Get a human readable description of task
+     */
+    virtual FString ToString() const override;
 
-	/**
-	 * Give the async task time to do its work
-	 * Can only be called on the async task manager thread
-	 */
-	virtual void Tick() override;
+    /**
+     * Give the async task time to do its work
+     * Can only be called on the async task manager thread
+     */
+    virtual void Tick() override;
 
-	/**
-	 * Give the async task a chance to marshal its data back to the game thread
-	 * Can only be called on the game thread by the async task manager
-	 */
-	virtual void Finalize() override;
+    /**
+     * Give the async task a chance to marshal its data back to the game thread
+     * Can only be called on the game thread by the async task manager
+     */
+    virtual void Finalize() override;
 
-	/**
-	 *	Async task is given a chance to trigger it's delegates
-	 */
-	virtual void TriggerDelegates() override;
+    /**
+     *	Async task is given a chance to trigger it's delegates
+     */
+    virtual void TriggerDelegates() override;
 
     /**
      * Check the state of the async task
@@ -118,13 +119,11 @@ public:
 
     virtual void TriggerDelegates() override
     {
-#if PLATFORM_ANDROID
         if (MessageHandle)
         {
             Delegate.Broadcast(MessageHandle, bIsError);
             ppf_FreeMessage(MessageHandle);
         }
-#endif
     }
 };
 

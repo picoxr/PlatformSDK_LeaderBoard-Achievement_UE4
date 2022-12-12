@@ -37,7 +37,7 @@
     <addAttribute tag="activity"  name="android:hardwareAccelerated" value="false" />
     <addElements tag="application">
       <meta-data android:name="pvr.app.type" android:value="vr" />
-	  <meta-data android:name="pvr.sdk.version" android:value="UE4_2.1.1.3" />
+	  <meta-data android:name="pvr.sdk.version" android:value="UE4_2.1.2.3" />
       <meta-data android:name="pxr.sdk.2dloading.flag" android:value="system" />
     </addElements>
 
@@ -110,6 +110,7 @@
             import com.pvr.tobservice.interfaces.ILongCallback;
             import com.pvr.tobservice.interfaces.IWDJsonCallback;
             import com.pvr.tobservice.interfaces.IWDModelsCallback;
+			import com.pvr.tobservice.interfaces.IGetControllerPairTimeCallback;
             import com.pvr.tobservice.enums.PBS_DeviceControlEnum;
             import com.pvr.tobservice.enums.PBS_HomeEventEnum;
             import com.pvr.tobservice.enums.PBS_HomeFunctionEnum;
@@ -127,6 +128,7 @@
 			import com.pvr.tobservice.enums.PBS_PICOCastUrlTypeEnum;
 			import com.pvr.tobservice.enums.PBS_PICOCastOptionOrStatusEnum;
 			import com.pvr.tobservice.enums.PBS_PICOCastOptionValueEnum;
+			import com.pvr.tobservice.enums.PBS_ControllerPairTimeEnum;
             import java.util.List;
             import com.psmart.aosoperation.MRCCalibration;
             import android.content.pm.PackageInfo;
@@ -942,6 +944,34 @@
 			{
 			    return ToBServiceHelper.getInstance().pbsPicoCastGetOptionOrStatus(PBS_PICOCastOptionOrStatusEnum.values()[castEnum], ext);
 			}
+			
+			public native void JavaToCSetControllerPairTimeCallback(int Result);
+            IIntCallback SetControllerPairTimeCallback = new IIntCallback.Stub()
+            {
+                @Override
+                public void callback(int result) throws RemoteException
+				{
+                    JavaToCSetControllerPairTimeCallback(result);
+                }
+            };
+            void SetControllerPairTime(int timeEnum, int ext)
+            {
+                ToBServiceHelper.getInstance().pbsSetControllerPairTime(PBS_ControllerPairTimeEnum.values()[timeEnum], SetControllerPairTimeCallback, ext);
+            }
+			
+			public native void JavaToCGetControllerPairTimeCallback(int Result);
+            IGetControllerPairTimeCallback GetControllerPairTimeCallback = new IGetControllerPairTimeCallback.Stub()
+            {
+                @Override
+                public void callBack(PBS_ControllerPairTimeEnum result) throws RemoteException
+				{
+                    JavaToCGetControllerPairTimeCallback(result.ordinal());
+                }
+            };
+            void GetControllerPairTime(int ext)
+            {
+                ToBServiceHelper.getInstance().pbsGetControllerPairTime(GetControllerPairTimeCallback, ext);
+            }
         </insert>
 	</gameActivityClassAdditions>
 

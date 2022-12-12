@@ -524,7 +524,7 @@ void UPico_AssetFileDeleteResult::InitParams(ppfAssetFileDeleteResult* InppfAsse
     ppfAssetId = ppf_AssetFileDeleteResult_GetAssetId(InppfAssetFileDeleteResultHandle);
     AssetId = uint64ToFString(ppfAssetId);
     FilePath = UTF8_TO_TCHAR(ppf_AssetFileDeleteResult_GetFilepath(InppfAssetFileDeleteResultHandle));
-    bIsSuccessed = ppf_AssetFileDeleteResult_GetSuccess(InppfAssetFileDeleteResultHandle);  
+    bIsSuccessed = ppf_AssetFileDeleteResult_GetSuccess(InppfAssetFileDeleteResultHandle);
 #endif
 }
 

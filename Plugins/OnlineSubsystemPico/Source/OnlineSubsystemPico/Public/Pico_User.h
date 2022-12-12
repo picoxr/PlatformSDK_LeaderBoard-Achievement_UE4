@@ -27,6 +27,8 @@ DECLARE_DYNAMIC_DELEGATE_ThreeParams(FGetNextUserPage, bool, bIsError, const FSt
 DECLARE_DYNAMIC_DELEGATE_ThreeParams(FGetLoginUser, bool, bIsError, const FString&, ErrorMessage, UPico_User*, User);
 DECLARE_DYNAMIC_DELEGATE_ThreeParams(FGetUserInfo, bool, bIsError, const FString&, ErrorMessage, UPico_User*, User);
 DECLARE_DYNAMIC_DELEGATE_ThreeParams(FGetPermissionResult, bool, bIsError, const FString&, ErrorMessage, UPico_PermissionResult*, PermissionResult);
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FGetAccessTokenResult, bool, bIsError, const FString&, ErrorMessage, const FString&, AccessToken);
+DECLARE_DYNAMIC_DELEGATE_FourParams(FLaunchFriendRequestResult, bool, bIsError, const FString&, ErrorMessage, bool, bDidCancel, bool, bDidSendRequest);
 
 /** @addtogroup Function Function
  *  This is the Function group
@@ -55,8 +57,10 @@ public:
     FGetLoggedInUserFriends GetLoggedInUserFriendsDelegate;
     FGetNextUserPage GetNextUserFriendsPageDelegate;
     FGetUserInfo GetUserInfoDelegate;
-    FGetPermissionResult GetAuthorizePermissionsDelegate;;
+    FGetPermissionResult GetAuthorizePermissionsDelegate;
     FGetPermissionResult RequestUserPermissionsDelegate;
+    FLaunchFriendRequestResult LaunchFriendRequestDelegate;
+    FGetAccessTokenResult GetAccesstokenDelegate;
 
     /// <summary>Gets the information about the current logged-in user.</summary>
     /// <param name="InGetLoginUserDelegate">Will be executed when the request has been completed. Delegate will contain the requested object class.</param>
@@ -137,12 +141,13 @@ public:
     /// <summary>
     /// Requests user permissions. The user will received a pop-up notification window.
     /// </summary>
-    /// <param name="OnGetPermissionResultCallback">Will be executed when the request has been completed. Delegate will contain the requested object class.
+    /// <param name="Permissions">Will be executed when the request has been completed. Delegate will contain the requested object class.
     /// * `user_info`: The permission to get the user's basic information, such as the user's nickname and profile picture.
     /// * `friend_relation`: The permission to get the user's friend list and invitable users.
     /// * `sports_userinfo`: The permission to get the user's information set in the sport center.
     /// * `sports_summarydata`: The permission to get a summary of the user's exercise data.
     /// </param>
+    /// <param name="OnGetPermissionResultCallback">Will be executed when the request has been completed. Delegate will contain the requested object class.</param>
     /// <returns>Bool:
     /// <ul>
     /// <li>`true`: success</li>
@@ -150,6 +155,21 @@ public:
     /// </ul>
     /// </returns>  
     bool RequestUserPermissions(TArray<FString> Permissions, FGetPermissionResult OnGetPermissionResultCallback);
+
+    /// <summary>
+    /// Launches the flow to apply for friendship with someone.
+    /// </summary>
+    /// <param name="UserId">The ID of the user that the friend request is sent to.</param>
+    /// <param name="OnLaunchFriendRequestResultCallback">Will be executed when the request has been completed. Delegate will contain the requested info.</param>
+    /// <returns>Bool:
+    /// <ul>
+    /// <li>`true`: success</li>
+    /// <li>`false`: failure</li>
+    /// </ul>
+    /// </returns>  
+    bool LaunchFriendRequestFlow(const FString UserId, FLaunchFriendRequestResult OnLaunchFriendRequestResultCallback);
+
+    bool GetAccessToken(FGetAccessTokenResult OnGetAccessTokenResultCallback);
 };
 /** @} */
 /** @} */
@@ -269,12 +289,13 @@ public:
     /// Requests user permissions. The user will received a pop-up notification window.
     /// </summary>
     /// <param name ="WorldContextObject">Used to get the information about the current world.</param>
-    /// <param name="OnGetPermissionResultCallback">Will be executed when the request has been completed. Delegate will contain the requested object class.
+    /// <param name="Permissions">Will be executed when the request has been completed. Delegate will contain the requested object class.
     /// * `user_info`: The permission to get the user's basic information, such as the user's nickname and profile picture.
     /// * `friend_relation`: The permission to get the user's friend list and invitable users.
     /// * `sports_userinfo`: The permission to get the user's information set in the sport center.
     /// * `sports_summarydata`: The permission to get a summary of the user's exercise data.
     /// </param>
+    /// <param name="OnGetPermissionResultCallback">Will be executed when the request has been completed. Delegate will contain the requested object class.</param>
     /// <returns>Bool:
     /// <ul>
     /// <li>`true`: success</li>
@@ -284,6 +305,23 @@ public:
     UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"), Category = "OnlinePico|User")
     static bool RequestUserPermissions(UObject* WorldContextObject, TArray<FString> Permissions, FGetPermissionResult OnGetPermissionResultCallback);
 
+    /// <summary>
+    /// Launches the flow to apply for friendship with someone.
+    /// </summary>
+    /// <param name ="WorldContextObject">Used to get the information about the current world.</param>
+    /// <param name="UserId">The ID of the user that the friend request is sent to.</param>
+    /// <param name="OnLaunchFriendRequestResultCallback">Will be executed when the request has been completed. Delegate will contain the requested info.</param>
+    /// <returns>Bool:
+    /// <ul>
+    /// <li>`true`: success</li>
+    /// <li>`false`: failure</li>
+    /// </ul>
+    /// </returns>  
+    UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"), Category = "OnlinePico|User")
+    static bool LaunchFriendRequestFlow(UObject* WorldContextObject, const FString UserId, FLaunchFriendRequestResult OnLaunchFriendRequestResultCallback);
+
+    UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"), Category = "OnlinePico|User")
+    static bool GetAccessToken(UObject* WorldContextObject, FGetAccessTokenResult OnGetAccessTokenResultCallback);
 };
 
 /** @} */ // end of BP_User

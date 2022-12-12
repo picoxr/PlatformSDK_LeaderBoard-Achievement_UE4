@@ -25,6 +25,8 @@ FPICOImportMapsDelegate UPICOXRSystemAPI::ImportMapsDelegate;
 FPICOControlSetAutoConnectWIFIWithErrorCodeDelegate UPICOXRSystemAPI::ControlSetAutoConnectWIFIWithErrorCodeDelegate;
 FPICOGetSwitchSystemFunctionStatusDelegate UPICOXRSystemAPI::GetSwitchSystemFunctionStatusDelegate;
 FPICOCastInitDelegate UPICOXRSystemAPI::PICOCastInitDelegate;
+FPICOSetControllerPairTimeDelegate UPICOXRSystemAPI::SetControllerPairTimeDelegate;
+FPICOGetControllerPairTimeDelegate UPICOXRSystemAPI::GetControllerPairTimeDelegate;
 // Sets default values for this component's properties
 UPICOXRSystemAPI::UPICOXRSystemAPI()
 {
@@ -1288,6 +1290,30 @@ EPICOCastOptionValueEnum UPICOXRSystemAPI::PXR_PICOCastGetOptionOrStatus(EPICOCa
 	return Result;
 }
 
+void UPICOXRSystemAPI::PXR_SetControllerPairTime(FPICOSetControllerPairTimeDelegate InSetControllerPairTimeDelegate, EControllerPairTimeEnum TimeEnum, int32 Ext)
+{
+	SetControllerPairTimeDelegate = InSetControllerPairTimeDelegate;
+#if PLATFORM_ANDROID
+	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+	{
+		static jmethodID Method = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "SetControllerPairTime", "(II)V", false);
+		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, Method, (int)TimeEnum, Ext);
+	}
+#endif
+}
+
+void UPICOXRSystemAPI::PXR_GetControllerPairTime(FPICOGetControllerPairTimeDelegate InGetControllerPairTimeDelegate, int32 Ext)
+{
+	GetControllerPairTimeDelegate = InGetControllerPairTimeDelegate;
+#if PLATFORM_ANDROID
+	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+	{
+		static jmethodID Method = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "GetControllerPairTime", "(I)V", false);
+		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, Method, Ext);
+	}
+#endif
+}
+
 #if PLATFORM_ANDROID
 extern "C" JNIEXPORT void  JNICALL Java_com_epicgames_ue4_GameActivity_JavaToCSetDeviceActionCallBack(JNIEnv * env, jclass clazz,int EventType, int Result)
 {
@@ -1502,19 +1528,29 @@ extern "C" JNIEXPORT void  JNICALL Java_com_epicgames_ue4_GameActivity_JavaToCIm
 	}
 }
 
-extern "C" JNIEXPORT void  JNICALL Java_com_epicgames_ue4_GameActivity_JavaToCControlSetAutoConnectWIFIWithErrorCodeCallback(JNIEnv * env, int Result)
+extern "C" JNIEXPORT void  JNICALL Java_com_epicgames_ue4_GameActivity_JavaToCControlSetAutoConnectWIFIWithErrorCodeCallback(JNIEnv * env, jclass clazz, int Result)
 {
 	UPICOXRSystemAPI::ControlSetAutoConnectWIFIWithErrorCodeDelegate.ExecuteIfBound(Result);
 }
 
-extern "C" JNIEXPORT void  JNICALL Java_com_epicgames_ue4_GameActivity_JavaToCGetSwitchSystemFunctionStatusCallback(JNIEnv * env, int Result)
+extern "C" JNIEXPORT void  JNICALL Java_com_epicgames_ue4_GameActivity_JavaToCGetSwitchSystemFunctionStatusCallback(JNIEnv * env, jclass clazz, int Result)
 {
 	UPICOXRSystemAPI::GetSwitchSystemFunctionStatusDelegate.ExecuteIfBound(Result);
 }
 
-extern "C" JNIEXPORT void  JNICALL Java_com_epicgames_ue4_GameActivity_JavaToCPICOCastInitCallback(JNIEnv * env, int Result)
+extern "C" JNIEXPORT void  JNICALL Java_com_epicgames_ue4_GameActivity_JavaToCPICOCastInitCallback(JNIEnv * env, jclass clazz, int Result)
 {
 	UPICOXRSystemAPI::PICOCastInitDelegate.ExecuteIfBound((ECastInitResult)Result);
+}
+
+extern "C" JNIEXPORT void  JNICALL Java_com_epicgames_ue4_GameActivity_JavaToCSetControllerPairTimeCallback(JNIEnv * env, jclass clazz, int Result)
+{
+	UPICOXRSystemAPI::SetControllerPairTimeDelegate.ExecuteIfBound(Result);
+}
+
+extern "C" JNIEXPORT void  JNICALL Java_com_epicgames_ue4_GameActivity_JavaToCGetControllerPairTimeCallback(JNIEnv * env, jclass clazz, int Result)
+{
+	UPICOXRSystemAPI::GetControllerPairTimeDelegate.ExecuteIfBound((EControllerPairTimeEnum)Result);
 }
 
 #endif

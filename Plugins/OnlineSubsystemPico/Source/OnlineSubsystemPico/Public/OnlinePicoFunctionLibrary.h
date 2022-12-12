@@ -6,12 +6,14 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
-#include "OnlineSubsystemPicoManager.h"
 #include "RTCPicoUserInterface.h"
+#include "PicoPresenceInterface.h"
 #include "OnlineSubsystem.h"
 #include "OnlineSessionSettings.h"
+#include "OnlineSubsystemPicoManager.h"
 #include "Net/OnlineBlueprintCallProxyBase.h"
 #include "OnlinePicoFunctionLibrary.generated.h"
+
 
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnlinePicoVerifyAppDelegate, const int32&, code);
 /// @file OnlinePicoFunctionLibrary.h
@@ -25,6 +27,7 @@ class ONLINESUBSYSTEMPICO_API UOnlinePicoFunctionLibrary : public UBlueprintFunc
 
 public:
 	UOnlinePicoFunctionLibrary();
+private:
 	static UOnlineSubsystemPicoManager* PicoSubsystemManager;
 
     /** @defgroup BlueprintFunction BlueprintFunction
@@ -32,11 +35,12 @@ public:
      *  @{
      */
 
-    /** @defgroup BP_Identity BP_Identity
-     *  This is the BP_Identity group
+    /** @defgroup BP_Identity BP_Identity(OnlineSub)
+     *  This is the BP_Identity(OnlineSub) group
      *  @{
      */
 
+public:
     // Pico Identity 
     
     /// <summary>Gets the account login information for the current device.</summary>
@@ -59,10 +63,10 @@ public:
     static UPico_User* GetLoginPicoUser(UObject* WorldContextObject, int32 LocalUserNum);
 
 
-    /** @} */ // end of BP_Identity
+    /** @} */ // end of BP_Identity(OnlineSub)
 
-    /** @defgroup BP_Friends BP_Friends
-     *  This is the BP_Friends group
+    /** @defgroup BP_Friends BP_Friends(OnlineSub)
+     *  This is the BP_Friends(OnlineSub) group
      *  @{
      */
 
@@ -98,7 +102,7 @@ public:
 	static FPicoUserInfo PicoGetFriend(UObject* WorldContextObject, int32 LocalUserNum, const FString& FriendId, const FString& ListName);
 
 
-    /** @} */ // end of BP_Friends
+    /** @} */ // end of BP_Friends(OnlineSub)
 
 
     /** @defgroup BP_RTC BP_RTC
@@ -470,8 +474,8 @@ public:
 
     /** @} */ // end of BP_RTC
 
-    /** @defgroup BP_Session BP_Session
-     *  This is the BP_Session group
+    /** @defgroup BP_Session BP_Session(OnlineSub)
+     *  This is the BP_Session(OnlineSub) group
      *  @{
      */
 
@@ -686,7 +690,7 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"), Category = "OnlinePico|Game")
 	static bool SendSessionInviteToFriend(UObject* WorldContextObject, int32 LocalUserNum, FName SessionName, const FString& Friend);
 
-    /** @} */ // end of BP_Session
+    /** @} */ // end of BP_Session(OnlineSub)
 	
 private:
 	static FOnlineSessionSettings GetOnlineSessionSettings(const FPicoOnlineSessionSettings& UpdatedSessionSettings);
@@ -880,6 +884,47 @@ public:
     UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"), Category = "OnlinePico|Presence")
     static bool PresenceGetDestinationsList(UObject* WorldContextObject, TArray<FPicoDestination>& OutList);
 
+    /// <summary>Call up the system panel to invite friends.</summary>
+    /// <param name="WorldContextObject">Used to get the information about the current world.</param> 
+    /// <param name="InLaunchInvitePanelDelegate">Will be executed when the request has been completed.</param>
+    /// <returns>Bool:
+    /// * `true`: success
+    /// * `false`: failure
+    /// </returns>
+    UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"), Category = "OnlinePico|Presence")
+    static bool LaunchInvitePanel(UObject* WorldContextObject, FOnlineManagerLaunchInvitePanelDelegate InLaunchInvitePanelDelegate);
+
+    /// <summary>Share videos or pictures to different platforms, currently only support sharing to Douyin apps.
+    /// @note Video file requirements:
+    /// For a better viewing experience, it is recommended to upload a 16:9 vertical video with a resolution of 720p(1280x720) and above
+    /// Support common video formats, mp4 and webm are recommended
+    /// The video file size should not exceed 128M and the duration should be within 15 minutes
+    /// Videos over 50m are recommended to be uploaded in multiple segments, and the total video size should be within 4GB.A single shard is recommended to be 20MB, with a minimum of 5MB
+    /// Image file requirements :
+    /// The total size of the picture does not exceed 100M
+    /// Up to 35 sheets at a time
+    /// </summary>
+    /// <param name="WorldContextObject">Used to get the information about the current world.</param> 
+    /// <param name="InMediaType">The media type:
+    /// * `0`: Video
+    /// * `1`: Image
+    /// * `2`: None
+    /// </param>
+    /// <param name="InVideoPath">The video file path.</param> 
+    /// <param name="InVideoThumbPath">The path of the video cover or the first few frames of the video as the video thumb.</param> 
+    /// <param name="InImagePaths">The array of image paths.</param> 
+    /// <param name="InShareType">The share type:
+    /// * `0`: Douyin
+    /// * `1`: None
+    /// </param>
+    /// <param name="InShareMediaDelegate">Will be executed when the request has been completed.</param>
+    /// <returns>Bool:
+    /// * `true`: success
+    /// * `false`: failure
+    /// </returns>
+    UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"), Category = "OnlinePico|Presence")
+    static bool ShareMedia(UObject* WorldContextObject, EShareMediaType InMediaType, const FString& InVideoPath, const FString& InVideoThumbPath, TArray<FString> InImagePaths, EShareAppTyp InShareType, FOnlineManagerShareMediaDelegate InShareMediaDelegate);
+
     /** @} */ // end of BP_Presence
 
     /** @defgroup BP_Application BP_Application
@@ -926,6 +971,19 @@ public:
     UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"), Category = "OnlinePico|Application")
     static bool LaunchOtherAppByPresence(UObject* WorldContextObject, const FString& AppID, const FString& PackageName, const FString& Message, const FString& ApiName, const FString& LobbySessionId, const FString& MatchSessionId, const FString& TrackId, const FString& Extra, FOnlineManagerLaunchOtherAppByPresenceDelegate InLaunchOtherAppByPresenceDelegate);
 
+    /// <summary>Launches a different app in a user's library.
+    /// @note If the user does not have that app installed, the user will be directed to that app's page on the PICO Store.
+    /// </summary>
+    /// <param name="WorldContextObject">Used to get the information about the current world.</param> 
+    /// <param name="AppId">The app id of the app to launch.</param>
+    /// <param name="Message">A message to be passed to the launched app.</param> 
+    /// <param name="InLaunchOtherAppByAppIdDelegate">Will be executed when the request has been completed.</param> 
+    /// <returns>Bool:
+    /// * `true`: success
+    /// * `false`: failure
+    /// </returns>
+    UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"), Category = "OnlinePico|Application")
+    static bool LaunchOtherAppByAppId(UObject* WorldContextObject, const FString& AppId, const FString& Message, FOnlineManagerLaunchOtherAppByAppIdDelegate InLaunchOtherAppByAppIdDelegate);
 
     /** @} */ // end of BP_Application
 
@@ -967,8 +1025,8 @@ public:
 
     /** @} */ // end of BP_ApplicationLifecycle
 
-    /** @defgroup BP_Leaderboard BP_Leaderboard
-     *  This is the BP_Leaderboard group
+    /** @defgroup BP_Leaderboard BP_Leaderboard(OnlineSub)
+     *  This is the BP_Leaderboard(OnlineSub) group
      *  @{
      */
 
@@ -1018,7 +1076,7 @@ public:
     /// </returns>
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"), Category = "OnlinePico|Leaderboard")
 	static bool WriteLeaderboards(UObject* WorldContextObject, const FString& SessionName, const FString& Player, UPARAM(ref)FPicoOnlineLeaderboardWrite& PicoWriteObject);
-    /** @} */ // end of BP_Leaderboard
+    /** @} */ // end of BP_Leaderboard(OnlineSub)
 	
     // Old Online Pico
 public:
@@ -1032,8 +1090,13 @@ public:
 
     /// <summary>Gets the class of online subsystem Pico manager for binding notifications.</summary>
     /// <returns>The UOnlineSubsystemPicoManager class.</returns>
-    UFUNCTION(BlueprintPure, Category = "OnlinePico")
-    static UOnlineSubsystemPicoManager* GetOnlineSubsystemPicoManager();
+    UFUNCTION(BlueprintPure, meta = (WorldContext = "WorldContextObject"), Category = "OnlinePico")
+    static UOnlineSubsystemPicoManager* GetOnlineSubsystemPicoManager(UObject* WorldContextObject);
+
+
+
+    UFUNCTION(BlueprintCallable, Category = "OnlinePico")
+    static void FindFileOrForder(TArray<FString>& OutFindArray, const FString& FindName, const FString& FindPath, bool IsFile = false, bool IsInDirectories = true);
 
     /** @} */ // end of BP_Common
     /** @} */ // end of BlueprintFunction

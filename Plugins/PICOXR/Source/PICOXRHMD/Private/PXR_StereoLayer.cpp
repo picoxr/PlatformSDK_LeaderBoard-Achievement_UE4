@@ -149,6 +149,19 @@ void FPICOXRStereoLayer::ManageUnderlayComponent()
 		}
 		UnderlayMeshComponent->SetWorldTransform(LayerDesc.Transform);
 	}
+	else
+	{
+		if (UnderlayActor)
+		{
+			if (UnderlayMeshComponent)
+			{
+				UnderlayMeshComponent->DestroyComponent();
+				UnderlayMeshComponent = nullptr;
+			}
+			UnderlayActor->Destroy();
+			UnderlayActor = nullptr;
+		}
+	}
 	return;
 }
 
@@ -425,6 +438,10 @@ bool FPICOXRStereoLayer::InitPXRLayer_RenderThread(FPICOXRRenderBridge* CustomPr
 		{
 			PxrLayerCreateParam.layerFlags |= PXR_LAYER_FLAG_STATIC_IMAGE;
 		}
+		else
+		{
+			PxrLayerCreateParam.layerFlags &= ~PXR_LAYER_FLAG_STATIC_IMAGE;
+		}
 
 		PxrLayerCreateParam.layerLayout = LayerDesc.LeftTexture.IsValid() ? PXR_LAYER_LAYOUT_STEREO : PXR_LAYER_LAYOUT_MONO;
 
@@ -580,6 +597,7 @@ bool FPICOXRStereoLayer::IfCanReuseLayers(const FPICOXRStereoLayer* InLayer) con
 		PxrLayerCreateParam.mipmapCount != InLayer->PxrLayerCreateParam.mipmapCount ||
 		PxrLayerCreateParam.sampleCount != InLayer->PxrLayerCreateParam.sampleCount ||
 		PxrLayerCreateParam.format != InLayer->PxrLayerCreateParam.format			||
+		PxrLayerCreateParam.layerFlags != InLayer->PxrLayerCreateParam.layerFlags   ||
 		PxrLayerCreateParam.layerType != InLayer->PxrLayerCreateParam.layerType)
 	{
 		return false;

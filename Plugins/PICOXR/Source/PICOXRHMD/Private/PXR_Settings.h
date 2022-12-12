@@ -85,11 +85,8 @@ public:
 	UPROPERTY(Config, EditAnywhere, Category = Feature, Meta = (DisplayName = "Enable Eye Tracking", ToolTip = "Enable Eye Tracking"))
 		bool bEnableEyeTracking;
 
-	//UPROPERTY(Config, EditAnywhere, Category = Feature, Meta = (DisplayName = "Enable Face Tracking", ToolTip = "Enable Face Tracking"))
-		bool bEnableFaceTracking;
-
-	//UPROPERTY(Config, EditAnywhere, Category = Feature, Meta = (EditCondition = "EnableEyeTracking", DisplayName = "Enable EyeTracking Marker", ToolTip = "Only Neo2 Eye Supports!"))
-		bool bEnableEyeTrackingMarker;
+	//UPROPERTY(Config, EditAnywhere, Category = Feature, Meta = (DisplayName = "Face Tracking Mode", ToolTip = "Face Tracking Mode"))
+		EPICOXRFaceTrackingMode FaceTrackingMode;
 
 	UPROPERTY(Config, EditAnywhere, Category = Feature, Meta = (DisplayName = "Use PICO Advance Interface"))
 		bool bUseAdvanceInterface;

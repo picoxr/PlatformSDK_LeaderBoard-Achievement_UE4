@@ -23,7 +23,6 @@ bool FOnlineLeaderboardPico::ReadLeaderboards(const TArray<FUniqueNetIdRef>& Pla
 bool FOnlineLeaderboardPico::ReadLeaderboards(const TArray< TSharedRef<const FUniqueNetId> >& Players, FOnlineLeaderboardReadRef& ReadObject)
 #endif
 {
-#if PLATFORM_ANDROID
 	bool bOnlyLoggedInUser = false;
 	if (Players.Num() > 0)
 	{
@@ -38,8 +37,6 @@ bool FOnlineLeaderboardPico::ReadLeaderboards(const TArray< TSharedRef<const FUn
 		}
 	}
 	return ReadPicoLeaderboards(/* Only Friends */ false, bOnlyLoggedInUser, ReadObject);
-#endif
-	return false;
 };
 
 bool FOnlineLeaderboardPico::ReadLeaderboardsForFriends(int32 LocalUserNum, FOnlineLeaderboardReadRef& ReadObject)
@@ -67,18 +64,29 @@ bool FOnlineLeaderboardPico::ReadLeaderboardsAroundUser(TSharedRef<const FUnique
 
 bool FOnlineLeaderboardPico::ReadPicoLeaderboards(bool bOnlyFriends, bool bOnlyLoggedInUser, FOnlineLeaderboardReadRef& ReadObject)
 {
-#if PLATFORM_ANDROID	
-	//TSharedPtr<FOnlineFriendsPico> FriendsInterfacePicoPtr = StaticCastSharedPtr<FOnlineFriendsPico>(FriendsInterface);
-	FString LeaderboardName = ReadObject->LeaderboardName.ToString();
-	TSharedRef<Pico_OnlineLeaderboardRead> PicoReadObject = StaticCastSharedRef<Pico_OnlineLeaderboardRead>(ReadObject);
-	TSharedPtr<Pico_OnlineLeaderboardRead> PicoReadObjectPtr = PicoReadObject;
 	int PageIndex = 0;
 	int PageSize = 100;
-	if (PicoReadObjectPtr.IsValid())
+	FString LeaderboardName;
+	if (!ReadObject->LeaderboardName.IsNone())
 	{
-		LeaderboardName = PicoReadObject->PicoLeaderboardName;
-		PageIndex = PicoReadObject->PicoPageIndex;
-		PageSize = PicoReadObject->PicoPageSize;
+		LeaderboardName = ReadObject->LeaderboardName.ToString();
+		SaveLog(ELogVerbosity::Type::Log, FString::Printf(TEXT("ReadPicoLeaderboards native ptr: PageIndex: %d, PageSize: %d, LeaderboardName: %s")
+			, PageSize, PageIndex
+			, *LeaderboardName));
+	}
+	else
+	{
+		TSharedRef<Pico_OnlineLeaderboardRead, ESPMode::ThreadSafe> PicoReadObject = StaticCastSharedRef<Pico_OnlineLeaderboardRead>(ReadObject);
+		TSharedPtr<Pico_OnlineLeaderboardRead, ESPMode::ThreadSafe> PicoReadObjectPtr = PicoReadObject;
+		if (PicoReadObjectPtr.IsValid())
+		{
+			LeaderboardName = PicoReadObject->PicoLeaderboardName;
+			PageIndex = PicoReadObject->PicoPageIndex;
+			PageSize = PicoReadObject->PicoPageSize;
+			SaveLog(ELogVerbosity::Type::Log, FString::Printf(TEXT("ReadPicoLeaderboards pico: PageIndex: %d, PageSize: %d, LeaderboardName: %s")
+			, PageSize, PageIndex
+			, *LeaderboardName));
+		}
 	}
 	auto FilterType = (bOnlyFriends) ? ppfLeaderboard_FilterFriends : ppfLeaderboard_FilterNone;
 	auto StartAt = ppfLeaderboard_StartAtTop;
@@ -87,12 +95,11 @@ bool FOnlineLeaderboardPico::ReadPicoLeaderboards(bool bOnlyFriends, bool bOnlyL
 	{
 		StartAt = ppfLeaderboard_StartAtCenteredOnViewer;
 	}
-
 	SaveLog(ELogVerbosity::Type::Log, FString::Printf(TEXT("ReadPicoLeaderboards PageSize: %d, PageIndex: %d, FilterType: %s, StartAt: %s, LeaderboardName: %s")
-		, PageSize, PageIndex
-		, *FString(FilterTypeNames[FilterType])
-		, *FString(StartAtNames[StartAt])
-		, *LeaderboardName));
+			, PageSize, PageIndex
+			, *FString(FilterTypeNames[FilterType])
+			, *FString(StartAtNames[StartAt])
+			, *LeaderboardName));
 	ReadObject->ReadState = EOnlineAsyncTaskState::InProgress;
 	PicoSubsystem.AddAsyncTask(
 		ppf_Leaderboard_GetEntries(TCHAR_TO_ANSI(*LeaderboardName), PageSize, PageIndex, FilterType, StartAt),
@@ -100,15 +107,13 @@ bool FOnlineLeaderboardPico::ReadPicoLeaderboards(bool bOnlyFriends, bool bOnlyL
 		{
 			OnReadLeaderboardsComplete(Message, bIsError, ReadObject);
 		}));
+	
 	return true;
-#endif
-	return false;
 }
 
 void FOnlineLeaderboardPico::OnReadLeaderboardsComplete(ppfMessageHandle Message, bool bIsError,
                                                         const FOnlineLeaderboardReadRef& ReadObject)
 {
-#if PLATFORM_ANDROID
 	if (bIsError)
 	{
 		ReadObject->ReadState = EOnlineAsyncTaskState::Failed;
@@ -199,7 +204,6 @@ void FOnlineLeaderboardPico::OnReadLeaderboardsComplete(ppfMessageHandle Message
 	}
 	ReadObject->ReadState = EOnlineAsyncTaskState::Done;
 	TriggerOnLeaderboardReadCompleteDelegates(true);
-#endif
 }
 
 void FOnlineLeaderboardPico::FreeStats(FOnlineLeaderboardRead& ReadObject)
@@ -210,8 +214,6 @@ void FOnlineLeaderboardPico::FreeStats(FOnlineLeaderboardRead& ReadObject)
 bool FOnlineLeaderboardPico::WriteLeaderboards(const FName& SessionName, const FUniqueNetId& Player,
                                                FOnlineLeaderboardWrite& WriteObject)
 {
-#if PLATFORM_ANDROID
-	auto PicoWriteObject = static_cast<Pico_OnlineLeaderboardWrite&>(WriteObject);
 	auto LoggedInPlayerId = PicoSubsystem.GetIdentityInterface()->GetUniquePlayerId(0);
 	if (!(LoggedInPlayerId.IsValid() && Player == *LoggedInPlayerId))
 	{
@@ -219,10 +221,10 @@ bool FOnlineLeaderboardPico::WriteLeaderboards(const FName& SessionName, const F
 		return false;
 	}
 
-	auto StatData = PicoWriteObject.FindStatByName(PicoWriteObject.RatedStat);
+	auto StatData = WriteObject.FindStatByName(WriteObject.RatedStat);
 	if (StatData == nullptr)
 	{
-		SaveLog(ELogVerbosity::Type::Error, FString::Printf(TEXT("WriteLeaderboards Could not find RatedStat: %s"), *PicoWriteObject.RatedStat.ToString()));
+		SaveLog(ELogVerbosity::Type::Error, FString::Printf(TEXT("WriteLeaderboards Could not find RatedStat: %s"), *WriteObject.RatedStat.ToString()));
 		return false;
 	}
 
@@ -259,44 +261,78 @@ bool FOnlineLeaderboardPico::WriteLeaderboards(const FName& SessionName, const F
 			return false;
 		}
 	}
-	for (const auto& LeaderboardName : PicoWriteObject.PicoLeaderboardNames)
+	SaveLog(ELogVerbosity::Type::Log, FString::Printf(TEXT("WriteLeaderboards begin WriteEntry LeaderboardNames.Num(): %d"), WriteObject.LeaderboardNames.Num()));
+	if (WriteObject.LeaderboardNames.Num() > 0)
 	{
-		SaveLog(ELogVerbosity::Type::Log, FString::Printf(
-		TEXT("WriteLeaderboards WriteEntry LeaderboardName: %s, Score: %lld, UpdateMethod: %d, ForceUpdate: %s, PicoWriteObject.RatedStat: %s")
-					, *LeaderboardName
-					, Score
-					, PicoWriteObject.UpdateMethod
-					, PicoWriteObject.UpdateMethod == ELeaderboardUpdateMethod::Force ? TEXT("true") : TEXT("false")
-					, *PicoWriteObject.RatedStat.ToString()
-		));
+		for (const auto& LeaderboardName : WriteObject.LeaderboardNames)
+		{
+			SaveLog(ELogVerbosity::Type::Log, FString::Printf(
+			TEXT("WriteLeaderboards WriteEntry LeaderboardName: %s, Score: %lld, UpdateMethod: %d, ForceUpdate: %s, WriteObject.RatedStat: %s")
+						, *LeaderboardName.ToString()
+						, Score
+						, WriteObject.UpdateMethod
+						, WriteObject.UpdateMethod == ELeaderboardUpdateMethod::Force ? TEXT("true") : TEXT("false")
+						, *WriteObject.RatedStat.ToString()
+			));
 		
-		PicoSubsystem.AddAsyncTask(
-			ppf_Leaderboard_WriteEntry(
-				TCHAR_TO_ANSI(*LeaderboardName), Score, /* extra_data */ nullptr, 0,
-				(PicoWriteObject.UpdateMethod == ELeaderboardUpdateMethod::Force)),
-			FPicoMessageOnCompleteDelegate::CreateLambda([this](ppfMessageHandle Message, bool bIsError)
-			{
-				if (bIsError)
+			PicoSubsystem.AddAsyncTask(
+				ppf_Leaderboard_WriteEntry(
+					TCHAR_TO_ANSI(*LeaderboardName.ToString()), Score, /* extra_data */ nullptr, 0,
+					(WriteObject.UpdateMethod == ELeaderboardUpdateMethod::Force)),
+				FPicoMessageOnCompleteDelegate::CreateLambda([this](ppfMessageHandle Message, bool bIsError)
 				{
-					auto Error = ppf_Message_GetError(Message);
-					auto ErrorMessage = ppf_Error_GetMessage(Error);
-					SaveLog(ELogVerbosity::Type::Error, FString::Printf(TEXT("WriteLeaderboards ErrorMessage: %s"), *FString(ErrorMessage)));
-				}
-			}));
+					if (bIsError)
+					{
+						auto Error = ppf_Message_GetError(Message);
+						auto ErrorMessage = ppf_Error_GetMessage(Error);
+						SaveLog(ELogVerbosity::Type::Error, FString::Printf(TEXT("WriteLeaderboards ErrorMessage: %s"), *FString(ErrorMessage)));
+					}
+				}));
+		}
 	}
-
+	else
+	{
+		SaveLog(ELogVerbosity::Type::Log, FString::Printf(TEXT("WriteLeaderboards try static_cast to Pico_OnlineLeaderboardWrite")));
+		Pico_OnlineLeaderboardWrite* PicoWriteObject = static_cast<Pico_OnlineLeaderboardWrite*>(&WriteObject);
+		if (PicoWriteObject == nullptr)
+		{
+			SaveLog(ELogVerbosity::Type::Error, FString::Printf(TEXT("WriteLeaderboards try static_cast to Pico_OnlineLeaderboardWrite fail")));
+			return false;
+		}
+		SaveLog(ELogVerbosity::Type::Log, FString::Printf(TEXT("WriteLeaderboards begin WriteEntry PicoLeaderboardNames.Num(): %d"), PicoWriteObject->PicoLeaderboardNames.Num()));
+		for (const auto& LeaderboardName : PicoWriteObject->PicoLeaderboardNames)
+		{
+			SaveLog(ELogVerbosity::Type::Log, FString::Printf(
+			TEXT("WriteLeaderboards WriteEntry LeaderboardName: %s, Score: %lld, UpdateMethod: %d, ForceUpdate: %s, PicoWriteObject->RatedStat: %s")
+						, *LeaderboardName
+						, Score
+						, PicoWriteObject->UpdateMethod
+						, PicoWriteObject->UpdateMethod == ELeaderboardUpdateMethod::Force ? TEXT("true") : TEXT("false")
+						, *PicoWriteObject->RatedStat.ToString()
+			));
+		
+			PicoSubsystem.AddAsyncTask(
+				ppf_Leaderboard_WriteEntry(
+					TCHAR_TO_ANSI(*LeaderboardName), Score, /* extra_data */ nullptr, 0,
+					(PicoWriteObject->UpdateMethod == ELeaderboardUpdateMethod::Force)),
+				FPicoMessageOnCompleteDelegate::CreateLambda([this](ppfMessageHandle Message, bool bIsError)
+				{
+					if (bIsError)
+					{
+						auto Error = ppf_Message_GetError(Message);
+						auto ErrorMessage = ppf_Error_GetMessage(Error);
+						SaveLog(ELogVerbosity::Type::Error, FString::Printf(TEXT("WriteLeaderboards ErrorMessage: %s"), *FString(ErrorMessage)));
+					}
+				}));
+		}
+	}
 	return true;
-#endif
-	return false;
 };
 
 bool FOnlineLeaderboardPico::FlushLeaderboards(const FName& SessionName)
 {
-#if PLATFORM_ANDROID
 	TriggerOnLeaderboardFlushCompleteDelegates(SessionName, true);
 	return true;
-#endif
-	return false;
 };
 
 bool FOnlineLeaderboardPico::WriteOnlinePlayerRatings(const FName& SessionName, int32 LeaderboardId,

@@ -190,6 +190,7 @@ bool FPICOXRHMD::GetCurrentPose(int32 DeviceId, FQuat& CurrentOrientation, FVect
 	if (IsInRenderingThread())
 	{
 		CurrentFrame = GameFrame_RenderThread.Get();
+		LateUpdatePose();
 	}
 	else if (IsInGameThread())
 	{
@@ -782,7 +783,7 @@ bool FPICOXRHMD::Initialize()
 	Pxr_EnableMultiview(bIsMobileMultiViewEnabled);
 	PXR_LOGI(PxrUnreal, "bIsMobileMultiViewEnabled = %d", bIsMobileMultiViewEnabled);
     EnableContentProtect(PICOXRSetting->bUseContentProtect);
-    FString UnrealSDKVersion = "UE4_2.1.1.3";
+    FString UnrealSDKVersion = "UE4_2.1.2.3";
 	FString UnrealVersion = FString::FromInt(ENGINE_MINOR_VERSION);
 	UnrealSDKVersion = UnrealSDKVersion + UnrealVersion;
 	PXR_LOGI(PxrUnreal, "%s,xrVersion:%s", PLATFORM_CHAR(*FEngineVersion::Current().ToString()), PLATFORM_CHAR(*UnrealSDKVersion));
@@ -861,7 +862,7 @@ bool FPICOXRHMD::Initialize()
 		CVarMobileMSAA->Set(MobileMSAAValue);
 	}
 	PXR_LOGI(PxrUnreal, "Final MSAA = %d", MobileMSAAValue);
- 	if (PICOXRSetting->bEnableEyeTracking || PICOXRSetting->bEnableFaceTracking)
+	if (PICOXRSetting->bEnableEyeTracking || PICOXRSetting->FaceTrackingMode != EPICOXRFaceTrackingMode::Disable)
 	{
 		EyeTracker = MakeShared<FPICOXREyeTracker>();
 	}
@@ -1454,28 +1455,7 @@ void FPICOXRHMD::PreLateLatchingViewFamily_RenderThread(FRHICommandListImmediate
 	if (CurrentFrame)
 	{
 		PXR_LOGV(PxrUnreal, "PreLateLatchingViewFamily_RenderThread:%u", CurrentFrame->FrameNumber);
-		UpdateSensorValue(CurrentFrame);
-		FQuat SubmitOrientation = CurrentFrame->Orientation;
-		FVector SubmitPosition = CurrentFrame->Position;
-		FVector SubmitAcceleration = CurrentFrame->Acceleration;
-		FVector SubmitAngularAcceleration = CurrentFrame->AngularAcceleration;
-		FVector SubmitAngularVelocity = CurrentFrame->AngularVelocity;
-		FVector SubmitVelocity = CurrentFrame->Velocity;
-		int32 SubmitViewNumber = CurrentFrame->ViewNumber;
-		ExecuteOnRHIThread_DoNotWait([=]()
-			{
-				FPXRGameFrame* CurrentFrame_RHIThread = GameFrame_RHIThread.Get();
-				if (CurrentFrame_RHIThread)
-				{
-					CurrentFrame_RHIThread->Orientation = SubmitOrientation;
-					CurrentFrame_RHIThread->Position = SubmitPosition;
-					CurrentFrame_RHIThread->Acceleration = SubmitAcceleration;
-					CurrentFrame_RHIThread->AngularAcceleration = SubmitAngularAcceleration;
-					CurrentFrame_RHIThread->AngularVelocity = SubmitAngularVelocity;
-					CurrentFrame_RHIThread->Velocity = SubmitVelocity;
-					CurrentFrame_RHIThread->ViewNumber = SubmitViewNumber;
-				}
-			});
+		CurrentFrame->Flags.bLateUpdateOK = false;
 	}
 }
 #endif
@@ -1683,7 +1663,7 @@ void FPICOXRHMD::OnBeginPlay(FWorldContext& InWorldContext)
  	{
  		EyeTracker->EnableEyeTracking(PICOXRSetting->bEnableEyeTracking);//TODO:Do we need to set the Tracking-Mode every time we open the new level?
  		EyeTracker->SetEyeTrackedPlayer(PlayerController);
-		EyeTracker->EnableFaceTracking(PICOXRSetting->bEnableFaceTracking);
+		EyeTracker->EnableFaceTracking(PICOXRSetting->FaceTrackingMode);
  	}
 }
 
@@ -1889,6 +1869,29 @@ void FPICOXRHMD::WaitFrame()
 	}
  }
 
+void FPICOXRHMD::LateUpdatePose()
+{
+	check(IsInRenderingThread());
+	FPXRGameFrame* CurrentFrame = GameFrame_RenderThread.Get();
+	if (CurrentFrame)
+	{
+		if (!CurrentFrame->Flags.bLateUpdateOK)
+		{
+			UpdateSensorValue(CurrentFrame);
+			CurrentFrame->Flags.bLateUpdateOK = true;
+			int32 SubmitViewNumber = CurrentFrame->ViewNumber;
+			ExecuteOnRHIThread_DoNotWait([=]()
+				{
+					FPXRGameFrame* CurrentFrame_RHIThread = GameFrame_RHIThread.Get();
+					if (CurrentFrame_RHIThread)
+					{
+						CurrentFrame_RHIThread->ViewNumber = SubmitViewNumber;
+					}
+				});
+		}
+	}
+}
+
  void FPICOXRHMD::OnGameFrameBegin_GameThread()
 {
 	 check(IsInGameThread());
@@ -1898,11 +1901,12 @@ void FPICOXRHMD::WaitFrame()
 		 PICOSplash->SwitchActiveSplash_GameThread();
 		 GameFrame_GameThread = MakeNewGameFrame();
 		 NextGameFrameToRender_GameThread = GameFrame_GameThread;
-		 RefreshStereoRenderingState();
+		 WaitFrame();
 		 if (!PICOSplash->IsShown())
 		 {
 			 UpdateSensorValue(NextGameFrameToRender_GameThread.Get());
 		 }
+		 RefreshStereoRenderingState();
 	 }
 #endif	
 }
@@ -1910,7 +1914,6 @@ void FPICOXRHMD::WaitFrame()
  void FPICOXRHMD::OnGameFrameEnd_GameThread()
  {
 	 check(IsInGameThread());
-	 WaitFrame();
 	 if (GameFrame_GameThread.IsValid())
 	 {
 		 PXR_LOGV(PxrUnreal, "OnGameFrameEnd %u", GameFrame_GameThread->FrameNumber);
@@ -2007,10 +2010,6 @@ void FPICOXRHMD::WaitFrame()
 					 PXRLayers_RenderThread = ValidXLayers;
 
 					 DelayDeletion.HandleLayerDeferredDeletionQueue_RenderThread();
-					 if (!PICOSplash->IsShown())
-					 {
-						 UpdateSensorValue(GameFrame_RenderThread.Get());
-					 }
 				 }
 			 });
 	 }

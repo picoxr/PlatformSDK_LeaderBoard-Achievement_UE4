@@ -121,6 +121,15 @@ typedef enum {
     ppfMessageType_Achievements_GetProgressByName                       = 10827,
     ppfMessageType_Achievements_Unlock                                  = 10828,
 
+    ppfMessageType_Challenges_Invite                = 10850,
+    ppfMessageType_Challenges_Get                   = 10851,
+    ppfMessageType_Challenges_GetList               = 10852,
+    ppfMessageType_Challenges_GetEntries            = 10853,
+    ppfMessageType_Challenges_GetEntriesAfterRank   = 10854,
+    ppfMessageType_Challenges_GetEntriesByIds       = 10855,
+    ppfMessageType_Challenges_Join                  = 10856,
+    ppfMessageType_Challenges_Leave                 = 10857,
+
     ppfMessageType_Application_LaunchOtherApp                       = 11001,
     ppfMessageType_Presence_GetSentInvites                          = 11002,
     ppfMessageType_Presence_GetInvitableUsers                       = 11003,
@@ -135,6 +144,9 @@ typedef enum {
     ppfMessageType_Notification_Application_RoomInviteAccepted = 11012,
 
     ppfMessageType_Application_LaunchOtherAppByMessage              = 11013,
+    ppfMessageType_Presence_ShareMedia = 11014,
+    ppfMessageType_Presence_LaunchInvitePanel = 11015,
+
     ppfMessageType_IAP_GetProductsBySKU = 12001,
     ppfMessageType_IAP_GetViewerPurchases = 12002,
     ppfMessageType_IAP_LaunchCheckoutFlow = 12003,
@@ -159,6 +171,8 @@ typedef enum {
     ppfMessageType_Notification_AssetFile_DownloadUpdate               = 13101,
     ppfMessageType_Notification_AssetFile_DeleteForSafety              = 13102,
     // dlc end
+
+
 } ppfMessageType;
 #endif
 

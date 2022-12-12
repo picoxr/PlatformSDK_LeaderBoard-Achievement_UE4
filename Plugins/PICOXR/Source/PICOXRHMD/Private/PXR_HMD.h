@@ -248,6 +248,7 @@ public:
 	FDelegateHandle PreLoadLevelDelegate;
 	bool bIsSwitchingLevel;
 	void WaitFrame();
+	void LateUpdatePose();
 	void OnGameFrameBegin_GameThread();
 	void OnGameFrameEnd_GameThread();
 	void OnRenderFrameBegin_GameThread();

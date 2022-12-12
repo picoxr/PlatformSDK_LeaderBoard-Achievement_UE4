@@ -27,7 +27,6 @@ bool FApplicationLifecycleInterface::ReadLaunchDetails()
 {
     FLaunchDetails NewLaunchDetails;
     LaunchDetails = NewLaunchDetails;
-#if PLATFORM_ANDROID
     auto LaunchDetailsHandle = ppf_ApplicationLifecycle_GetLaunchDetails();
     auto UserArrayHandle = ppf_LaunchDetails_GetUsers(LaunchDetailsHandle);
     UPico_UserArray* UserArray = NewObject<UPico_UserArray>();
@@ -62,92 +61,9 @@ bool FApplicationLifecycleInterface::ReadLaunchDetails()
         LaunchType = ELaunchType::Deeplink;
     }
     LaunchDetails.LaunchType = LaunchType;
-
-
     return true;
-#endif
-    return false;
-}
 
-//void FApplicationLifecycleInterface::OnQueryReadLaunchDetailsComplete(ppfMessageHandle Message, ppfUserArrayHandle UserArrayHandle, bool bIsError, FLaunchDetails& OutLaunchDetails, TArray<FPicoUserInfo>& OutList, bool bAppendToExistingArray, const FOnReadDetailsComplete& Delegate)
-//{
-//#if PLATFORM_ANDROID
-//    FString ErrorStr;
-//    if (UserArrayHandle == nullptr)
-//    {
-//
-//        if (bIsError)
-//        {
-//            auto Error = ppf_Message_GetError(Message);
-//            auto ErrorMessage = ppf_Error_GetMessage(Error);
-//            ErrorStr = UTF8_TO_TCHAR(ErrorMessage);
-//            Delegate.ExecuteIfBound(false, ErrorStr);
-//            return;
-//        }
-//        UserArrayHandle = ppf_Message_GetUserArray(Message);
-//    }
-//    auto UserNum = ppf_UserArray_GetSize(UserArrayHandle);
-//    if (!bAppendToExistingArray)
-//    {
-//        OutList.Empty(UserNum);
-//    }
-//
-//    for (size_t FriendIndex = 0; FriendIndex < UserNum; ++FriendIndex)
-//    {
-//        auto Friend = ppf_UserArray_GetElement(UserArrayHandle, FriendIndex);
-//        FString FriendId = UTF8_TO_TCHAR(ppf_User_GetID(Friend));
-//        FString FriendDisplayName = UTF8_TO_TCHAR(ppf_User_GetDisplayName(Friend));
-//        auto FriendInviteToken = ppf_User_GetInviteToken(Friend);
-//        FString FriendInviteTokenString(UTF8_TO_TCHAR((FriendInviteToken != nullptr) ? FriendInviteToken : ""));
-//        FString SmallImageUrl = UTF8_TO_TCHAR(ppf_User_GetSmallImageUrl(Friend));
-//        FString PresencePackage = UTF8_TO_TCHAR(ppf_User_GetPresencePackage(Friend));
-//        FString ImageUrl = UTF8_TO_TCHAR(ppf_User_GetImageUrl(Friend));
-//        ppfGender Gender = ppf_User_GetGender(Friend);
-//        FString Presence = UTF8_TO_TCHAR(ppf_User_GetPresence(Friend));
-//        FString PresenceDeeplinkMessage = UTF8_TO_TCHAR(ppf_User_GetPresenceDeeplinkMessage(Friend));
-//        FString PresenceDestinationApiName = UTF8_TO_TCHAR(ppf_User_GetPresenceDestinationApiName(Friend));
-//        FString PresenceLobbySessionId = UTF8_TO_TCHAR(ppf_User_GetPresenceLobbySessionId(Friend));
-//        FString PresenceMatchSessionId = UTF8_TO_TCHAR(ppf_User_GetPresenceMatchSessionId(Friend));
-//        auto FriendPresenceStatus = ppf_User_GetPresenceStatus(Friend);
-//        FPicoUserInfo PicoFriend;
-//        if (FriendPresenceStatus == ppfUserPresenceStatus_OffLine)
-//        {
-//            PicoFriend.FriendPresenceStatus = EPresenceStatus::OffLine;
-//        }
-//        else if (FriendPresenceStatus == ppfUserPresenceStatus_OnLine)
-//        {
-//            PicoFriend.FriendPresenceStatus = EPresenceStatus::OnLine;
-//        }
-//        else
-//        {
-//            PicoFriend.FriendPresenceStatus = EPresenceStatus::Unknow;
-//        }
-//        PicoFriend.DisPlayName = FriendDisplayName;
-//        PicoFriend.UserId = FriendId;
-//        OutList.Add(PicoFriend);
-//    }
-//    bool bHasPaging = ppf_UserArray_HasNextPage(UserArrayHandle);
-//    if (bHasPaging)
-//    {
-//        PicoSubsystem.AddAsyncTask
-//        (
-//            ppf_User_GetNextUserArrayPage(ppf_UserArray_GetNextPageParam(UserArrayHandle)),
-//            FPicoMessageOnCompleteDelegate::CreateLambda
-//            (
-//                [this, &OutLaunchDetails, &OutList, Delegate](ppfMessageHandle InMessage, bool bInIsError)
-//                {
-//                    OnQueryReadLaunchDetailsComplete(InMessage, nullptr, bInIsError, OutLaunchDetails, OutList, true, Delegate);
-//                }
-//            )
-//        );
-//    }
-//    else
-//    {
-//        Delegate.ExecuteIfBound(true, ErrorStr);
-//    }
-//#endif
-//
-//}
+}
 
 bool FApplicationLifecycleInterface::GetLaunchDetails(FLaunchDetails& OutLaunchDetails)
 {
@@ -158,13 +74,12 @@ bool FApplicationLifecycleInterface::GetLaunchDetails(FLaunchDetails& OutLaunchD
 
 bool FApplicationLifecycleInterface::LogDeeplinkResult(const FString& TrackingID, ELaunchResult LaunchResult)
 {
-#if PLATFORM_ANDROID
     ppfLaunchResult Result = ppfLaunchResult_Unknown;
     switch (LaunchResult)
     {
     case ELaunchResult::Unknown:
         Result = ppfLaunchResult_Unknown;
-    	break;
+        break;
     case ELaunchResult::Success:
         Result = ppfLaunchResult_Success;
         break;
@@ -188,13 +103,10 @@ bool FApplicationLifecycleInterface::LogDeeplinkResult(const FString& TrackingID
     }
     ppf_ApplicationLifecycle_LogDeeplinkResult(TCHAR_TO_UTF8(*TrackingID), Result);
     return true;
-#endif
-    return false;
 }
 
 void FApplicationLifecycleInterface::OnLaunchIntentChangedNotification(ppfMessageHandle Message, bool bIsError)
 {
-#if PLATFORM_ANDROID
     if (bIsError)
     {
         UE_LOG(ApplicationLifecycleInterface, Error, TEXT("OnLaunchIntentChangedNotification error!"));
@@ -202,5 +114,4 @@ void FApplicationLifecycleInterface::OnLaunchIntentChangedNotification(ppfMessag
     }
     FString MessageString = UTF8_TO_TCHAR(ppf_Message_GetString(Message));
     LaunchIntentChangedCallback.Broadcast(MessageString);
-#endif
 }

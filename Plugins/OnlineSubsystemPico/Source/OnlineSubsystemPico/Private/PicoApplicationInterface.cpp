@@ -22,7 +22,6 @@ FPicoApplicationInterface::~FPicoApplicationInterface()
 
 bool FPicoApplicationInterface::LaunchOtherApp(const FString& PackageName, const FString& Message, const FOnLaunchOtherAppComplete& Delegate /*= FOnGetTokenComplete()*/)
 {
-#if PLATFORM_ANDROID
     auto ApplicationOptions = ppf_ApplicationOptions_Create();
     ppf_ApplicationOptions_SetDeeplinkMessage(ApplicationOptions, TCHAR_TO_UTF8(*Message));
     PicoSubsystem.AddAsyncTask
@@ -38,13 +37,10 @@ bool FPicoApplicationInterface::LaunchOtherApp(const FString& PackageName, const
     );
     ppf_ApplicationOptions_Destroy(ApplicationOptions);
     return true;
-#endif
-    return false;
 }
 
 void FPicoApplicationInterface::OnQueryLaunchOtherAppComplete(ppfMessageHandle Message, bool bIsError, const FOnLaunchOtherAppComplete& Delegate)
 {
-#if PLATFORM_ANDROID
     FString ErrorStr;
     if (bIsError)
     {
@@ -59,33 +55,30 @@ void FPicoApplicationInterface::OnQueryLaunchOtherAppComplete(ppfMessageHandle M
         FString PayloadMessage = UTF8_TO_TCHAR(ppf_Message_GetString(Message));
         Delegate.ExecuteIfBound(PayloadMessage, true, FString());
     }
-
-#endif
 }
 
 bool FPicoApplicationInterface::GetVersion(const FOnGetVersion& Delegate /*= FOnGetVersion()*/)
 {
-//#if PLATFORM_ANDROID
-//    PicoSubsystem.AddRequestDelegate
-//    (
-//        ppf_Application_GetVersion(),
-//        FPicoMessageOnCompleteDelegate::CreateLambda
-//        (
-//            [this, Delegate](ppfMessageHandle Message, bool bIsError)
-//            {
-//                OnQueryGetVersionComplete(Message, bIsError, Delegate);
-//            }
-//        )
-//    );
-//
-//    return true;
-//#endif
+    //#if CHECK_PLATFORM
+    //    PicoSubsystem.AddRequestDelegate
+    //    (
+    //        ppf_Application_GetVersion(),
+    //        FPicoMessageOnCompleteDelegate::CreateLambda
+    //        (
+    //            [this, Delegate](ppfMessageHandle Message, bool bIsError)
+    //            {
+    //                OnQueryGetVersionComplete(Message, bIsError, Delegate);
+    //            }
+    //        )
+    //    );
+    //
+    //    return true;
+    //#endif
     return false;
 }
 
 void FPicoApplicationInterface::OnQueryGetVersionComplete(ppfMessageHandle Message, bool bIsError, const FOnGetVersion& Delegate)
 {
-#if PLATFORM_ANDROID
     FString ErrorStr;
     if (bIsError)
     {
@@ -100,13 +93,10 @@ void FPicoApplicationInterface::OnQueryGetVersionComplete(ppfMessageHandle Messa
         FString PayloadMessage = UTF8_TO_TCHAR(ppf_Message_GetString(Message));
         Delegate.ExecuteIfBound(PayloadMessage, true, FString());
     }
-
-#endif
 }
 
 bool FPicoApplicationInterface::LaunchOtherAppByPresence(const FString& AppID, const FString& PackageName, const FString& Message, const FString& ApiName, const FString& LobbySessionId, const FString& MatchSessionId, const FString& TrackId, const FString& Extra, const FOnLaunchOtherAppByPresenceComplete& Delegate /*= FOnLaunchOtherAppByPresenceComplete()*/)
 {
-#if PLATFORM_ANDROID
     auto ApplicationByPresenceOptions = ppf_ApplicationByPresenceOptions_Create();
     ppf_ApplicationByPresenceOptions_SetDeeplinkMessage(ApplicationByPresenceOptions, TCHAR_TO_UTF8(*Message));
     ppf_ApplicationByPresenceOptions_SetDestinationApiName(ApplicationByPresenceOptions, TCHAR_TO_UTF8(*ApiName));
@@ -127,13 +117,11 @@ bool FPicoApplicationInterface::LaunchOtherAppByPresence(const FString& AppID, c
     );
 
     ppf_ApplicationByPresenceOptions_Destroy(ApplicationByPresenceOptions);
-#endif
-    return false;
+    return true;
 }
 
 void FPicoApplicationInterface::OnQueryLaunchOtherAppByPresenceComplete(ppfMessageHandle Message, bool bIsError, const FOnLaunchOtherAppByPresenceComplete& Delegate)
 {
-#if PLATFORM_ANDROID
     FString ErrorStr;
     if (bIsError)
     {
@@ -148,6 +136,44 @@ void FPicoApplicationInterface::OnQueryLaunchOtherAppByPresenceComplete(ppfMessa
         FString PayloadMessage = UTF8_TO_TCHAR(ppf_Message_GetString(Message));
         Delegate.ExecuteIfBound(PayloadMessage, true, FString());
     }
+}
 
+bool FPicoApplicationInterface::LaunchOtherAppByAppId(const FString& AppId, const FString& Message, const FOnLaunchOtherAppByAppIdComplete& Delegate /*= FOnLaunchOtherAppByAppIdComplete()*/)
+{
+#if PLATFORM_ANDROID
+    auto ApplicationOptions = ppf_ApplicationOptions_Create();
+    ppf_ApplicationOptions_SetDeeplinkMessage(ApplicationOptions, TCHAR_TO_UTF8(*Message));
+    PicoSubsystem.AddAsyncTask
+    (
+        ppf_Application_LaunchOtherAppByAppID(TCHAR_TO_UTF8(*AppId), ApplicationOptions),
+        FPicoMessageOnCompleteDelegate::CreateLambda
+        (
+            [this, Delegate](ppfMessageHandle Message, bool bIsError)
+            {
+                OnQueryLaunchOtherAppByAppIdComplete(Message, bIsError, Delegate);
+            }
+        )
+    );
+    ppf_ApplicationOptions_Destroy(ApplicationOptions);
+    return true;
 #endif
+    return false;
+}
+
+void FPicoApplicationInterface::OnQueryLaunchOtherAppByAppIdComplete(ppfMessageHandle Message, bool bIsError, const FOnLaunchOtherAppByAppIdComplete& Delegate)
+{
+    FString ErrorStr;
+    if (bIsError)
+    {
+        auto Error = ppf_Message_GetError(Message);
+        auto ErrorMessage = ppf_Error_GetMessage(Error);
+        ErrorStr = FString(ErrorMessage);
+        Delegate.ExecuteIfBound(FString(), false, ErrorStr);
+        return;
+    }
+    else
+    {
+        FString PayloadMessage = UTF8_TO_TCHAR(ppf_Message_GetString(Message));
+        Delegate.ExecuteIfBound(PayloadMessage, true, FString());
+    }
 }

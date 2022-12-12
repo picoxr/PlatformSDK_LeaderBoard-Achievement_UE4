@@ -324,18 +324,18 @@ class ONLINESUBSYSTEMPICO_API UPico_Purchase : public UObject
 	GENERATED_BODY()
 
 private:
-	int32 ExpirationTime = 0;
-	int32 GrantTime = 0;
+	int64 ExpirationTime = 0;
+	int64 GrantTime = 0;
 	FString ID = FString();
 	FString SKU = FString();
 public:
 	void InitParams(ppfPurchase* InppfPurchaseHandle);
 
 	UFUNCTION(BlueprintPure, Category = "Pico Platform|IAP|Purchase")
-	int32 GetExpirationTime();
+	int64 GetExpirationTime();
 
 	UFUNCTION(BlueprintPure, Category = "Pico Platform|IAP|Purchase")
-	int32 GetGrantTime();
+	int64 GetGrantTime();
 
 	UFUNCTION(BlueprintPure, Category = "Pico Platform|IAP|Purchase")
 	FString GetID();

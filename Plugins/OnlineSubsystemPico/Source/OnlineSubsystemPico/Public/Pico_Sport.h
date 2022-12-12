@@ -51,7 +51,6 @@ public:
     /// <summary>
     /// Gets a summary of the user's daily exercise data for a specified period within the recent 3 months.
     /// For example, if the period you set is between 2022/08/16 and 2022/08/18, the exercise data generated on 08/16, 08/17, and 08/18 will be returned.
-    /// @note Available in Mainland China only.
     /// </summary>
     /// <param name="BeginTime">A DateTime struct(FDateTime(int64 InTicks).GetTicks()) defining the begin time of the period.</param>
     /// <param name="EndTime">A DateTime struct(FDateTime(int64 InTicks).GetTicks()) defining the end time of the period.</param>
@@ -66,7 +65,6 @@ public:
 
     /// <summary>
     /// Gets a summary of the user's exercise data for a specified duration within today. The duration should not exceed 24 hours.
-    /// @note Available in Mainland China only.
     /// </summary>
     /// <param name="BeginTime">A DateTime struct(FDateTime(int64 InTicks).GetTicks()) defining the begin time of the period.</param>
     /// <param name="EndTime">A DateTime struct(FDateTime(int64 InTicks)GetTicks()) defining the end time of the period.</param>
@@ -81,7 +79,6 @@ public:
 
     /// <summary>
     /// Gets a user's basic information and exercise plan.
-    /// @note Available in Mainland China only.
     /// </summary>
     /// <param name="InGetSportUserInfoDelegate">Will be executed when the request has been completed. Delegate will contain the requested object class.</param>
     /// <returns>Bool:
@@ -119,7 +116,6 @@ public:
     /// <summary>
     /// Gets a summary of the user's daily exercise data for a specified period within the recent 3 months.
     /// For example, if the period you set is between 2022/08/16 and 2022/08/18, the exercise data generated on 08/16, 08/17, and 08/18 will be returned.
-    /// @note Available in Mainland China only.
     /// </summary>
     /// <param name ="WorldContextObject">Used to get the information about the current world.</param>
     /// <param name="BeginTime">A DateTime struct(FDateTime(int64 InTicks).GetTicks()) defining the begin time of the period.</param>
@@ -136,7 +132,6 @@ public:
 
     /// <summary>
     /// Gets a summary of the user's exercise data for a specified duration within today. The duration should not exceed 24 hours.
-    /// @note Available in Mainland China only.
     /// </summary>
     /// <param name ="WorldContextObject">Used to get the information about the current world.</param>
     /// <param name="BeginTime">A DateTime struct(FDateTime(int64 InTicks).GetTicks()) defining the begin time of the period.</param>
@@ -153,7 +148,6 @@ public:
     
     /// <summary>
     /// Gets a user's basic information and exercise plan.
-    /// @note Available in Mainland China only.
     /// </summary>
     /// <param name ="WorldContextObject">Used to get the information about the current world.</param>
     /// <param name="InGetSportUserInfoDelegate">Will be executed when the request has been completed. Delegate will contain the requested object class.</param>

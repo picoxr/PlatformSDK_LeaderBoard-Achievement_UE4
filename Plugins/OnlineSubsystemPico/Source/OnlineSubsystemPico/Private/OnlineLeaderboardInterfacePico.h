@@ -18,38 +18,38 @@
  *  @{
  */
 
- /** @defgroup Leaderboard Leaderboard
-  *  This is the Leaderboard group
+ /** @defgroup Leaderboard Leaderboard(OnlineSub)
+  *  This is the Leaderboard(OnlineSub) group
   *  @{
   */
 
 
-/**
-*	IOnlineLeaderboard - Interface class for Leaderboard
-*/
+  /**
+  *	IOnlineLeaderboard - Interface class for Leaderboard
+  */
 class FOnlineLeaderboardPico : public IOnlineLeaderboards
 {
 private:
-	
-	// Reference to the owning subsystem
-	FOnlineSubsystemPico& PicoSubsystem;
 
-	bool ReadPicoLeaderboards(bool bOnlyFriends, bool bOnlyLoggedInUser, FOnlineLeaderboardReadRef& ReadObject);
-	void OnReadLeaderboardsComplete(ppfMessageHandle Message, bool bIsError, const FOnlineLeaderboardReadRef& ReadObject);
+    // Reference to the owning subsystem
+    FOnlineSubsystemPico& PicoSubsystem;
 
-	const char* FilterTypeNames[4] = { "None", "Friends", "Unknown", "UserIds" };
-	const char* StartAtNames[4] = { "Top", "CenteredOnViewer", "CenteredOnViewerOrTop", "Unknown" };
+    bool ReadPicoLeaderboards(bool bOnlyFriends, bool bOnlyLoggedInUser, FOnlineLeaderboardReadRef& ReadObject);
+    void OnReadLeaderboardsComplete(ppfMessageHandle Message, bool bIsError, const FOnlineLeaderboardReadRef& ReadObject);
 
-	static void SaveLog(const ELogVerbosity::Type Verbosity, const FString& Log);
+    const char* FilterTypeNames[4] = { "None", "Friends", "Unknown", "UserIds" };
+    const char* StartAtNames[4] = { "Top", "CenteredOnViewer", "CenteredOnViewerOrTop", "Unknown" };
+
+    static void SaveLog(const ELogVerbosity::Type Verbosity, const FString& Log);
 
 public:
 
 
     //Constructor * @param InSubsystem - A reference to the owning subsystem
-	FOnlineLeaderboardPico(FOnlineSubsystemPico& InSubsystem);
+    FOnlineLeaderboardPico(FOnlineSubsystemPico& InSubsystem);
 
     // Default destructor
-	virtual ~FOnlineLeaderboardPico() = default;
+    virtual ~FOnlineLeaderboardPico() = default;
 
     // Begin IOnlineLeaderboard interface
 
@@ -70,9 +70,9 @@ public:
 #if ENGINE_MAJOR_VERSION > 4
     virtual bool ReadLeaderboards(const TArray< FUniqueNetIdRef >& Players, FOnlineLeaderboardReadRef& ReadObject) override;
 #elif ENGINE_MINOR_VERSION > 26
-	virtual bool ReadLeaderboards(const TArray< FUniqueNetIdRef >& Players, FOnlineLeaderboardReadRef& ReadObject) override;
+    virtual bool ReadLeaderboards(const TArray< FUniqueNetIdRef >& Players, FOnlineLeaderboardReadRef& ReadObject) override;
 #elif ENGINE_MINOR_VERSION > 24
-	virtual bool ReadLeaderboards(const TArray< TSharedRef<const FUniqueNetId> >& Players, FOnlineLeaderboardReadRef& ReadObject) override;
+    virtual bool ReadLeaderboards(const TArray< TSharedRef<const FUniqueNetId> >& Players, FOnlineLeaderboardReadRef& ReadObject) override;
 #endif
 
     /// <summary>Gets the entries of the friends of the current logged-in user on a leaderboard.</summary>
@@ -84,16 +84,16 @@ public:
     /// <li>`false`: failure</li>
     /// </ul>
     /// </returns>
-	virtual bool ReadLeaderboardsForFriends(int32 LocalUserNum, FOnlineLeaderboardReadRef& ReadObject) override;
-	
-	// Not supported. Always return false.
-	virtual bool ReadLeaderboardsAroundRank(int32 Rank, uint32 Range, FOnlineLeaderboardReadRef& ReadObject) override;
-	
-	// Not supported. Always return false.
-	virtual bool ReadLeaderboardsAroundUser(TSharedRef<const FUniqueNetId> Player, uint32 Range, FOnlineLeaderboardReadRef& ReadObject) override;
+    virtual bool ReadLeaderboardsForFriends(int32 LocalUserNum, FOnlineLeaderboardReadRef& ReadObject) override;
 
-	// Not supported.
-	virtual void FreeStats(FOnlineLeaderboardRead& ReadObject) override;
+    // Not supported. Always return false.
+    virtual bool ReadLeaderboardsAroundRank(int32 Rank, uint32 Range, FOnlineLeaderboardReadRef& ReadObject) override;
+
+    // Not supported. Always return false.
+    virtual bool ReadLeaderboardsAroundUser(TSharedRef<const FUniqueNetId> Player, uint32 Range, FOnlineLeaderboardReadRef& ReadObject) override;
+
+    // Not supported.
+    virtual void FreeStats(FOnlineLeaderboardRead& ReadObject) override;
 
     /// <summary>Writes an entry to a leaderboard for the current logged-in user.</summary>
     ///
@@ -106,7 +106,7 @@ public:
     /// <li>`false`: failure</li>
     /// </ul>
     /// </returns>
-	virtual bool WriteLeaderboards(const FName& SessionName, const FUniqueNetId& Player, FOnlineLeaderboardWrite& WriteObject) override;
+    virtual bool WriteLeaderboards(const FName& SessionName, const FUniqueNetId& Player, FOnlineLeaderboardWrite& WriteObject) override;
 
     /// <summary>Executes developer-defined functions.</summary>
     ///
@@ -117,16 +117,16 @@ public:
     /// <li>`false`: failure</li>
     /// </ul>
     /// </returns>
-	virtual bool FlushLeaderboards(const FName& SessionName) override;
+    virtual bool FlushLeaderboards(const FName& SessionName) override;
 
-	// Not supported. Always return false.
-	virtual bool WriteOnlinePlayerRatings(const FName& SessionName, int32 LeaderboardId, const TArray<FOnlinePlayerScore>& PlayerScores) override;
-	// End IOnlineLeaderboard interface
+    // Not supported. Always return false.
+    virtual bool WriteOnlinePlayerRatings(const FName& SessionName, int32 LeaderboardId, const TArray<FOnlinePlayerScore>& PlayerScores) override;
+    // End IOnlineLeaderboard interface
 };
 #if ENGINE_MINOR_VERSION > 26
 typedef TSharedPtr<FOnlineLeaderboardPico, ESPMode::ThreadSafe> FOnlineLeaderboardPicoPtr;
 #elif ENGINE_MINOR_VERSION > 24
 #endif
 
-/** @} */ // end of Leaderboard
+/** @} */ // end of Leaderboard(OnlineSub)
 /** @} */ // end of Function

@@ -5,6 +5,7 @@
 
 #include "PicoPresenceInterface.h"
 #include "OnlineSubsystemPicoPrivate.h"
+#include "OnlineFriendsInterfacePico.h"
 #include <vector>
 #include <string>
 
@@ -37,7 +38,6 @@ FPicoPresenceInterface::~FPicoPresenceInterface()
 bool FPicoPresenceInterface::PresenceClear(const FOnPresenceClearComplete& Delegate /*= FOnPresenceClearComplete()*/)
 {
     UE_LOG(PresenceInterface, Log, TEXT("FPicoPresenceInterface::PresenceClear"));
-#if PLATFORM_ANDROID
     PicoSubsystem.AddAsyncTask
     (
         ppf_Presence_Clear(),
@@ -50,14 +50,11 @@ bool FPicoPresenceInterface::PresenceClear(const FOnPresenceClearComplete& Deleg
         )
     );
     return true;
-#endif
-    return false;
 }
 
 void FPicoPresenceInterface::OnQueryPresenceClearComplete(ppfMessageHandle Message, bool bIsError, const FOnPresenceClearComplete& Delegate)
 {
     UE_LOG(PresenceInterface, Log, TEXT("FPicoPresenceInterface::OnQueryPresenceClearComplete"));
-#if PLATFORM_ANDROID
     FString ErrorStr;
     if (bIsError)
     {
@@ -71,14 +68,11 @@ void FPicoPresenceInterface::OnQueryPresenceClearComplete(ppfMessageHandle Messa
     {
         Delegate.ExecuteIfBound(true, FString());
     }
-#endif
 }
 
 bool FPicoPresenceInterface::ReadInvitableUser(TArray<FString> SuggestedUserList, const FOnReadInvitableUserComplete& Delegate /*= FOnReadInvitableUserComplete()*/)
 {
     UE_LOG(PresenceInterface, Log, TEXT("FPicoPresenceInterface::ReadInvitableUser"));
-#if PLATFORM_ANDROID
-
     auto InviteOptionsHandle = ppf_InviteOptions_Create();
     ppf_InviteOptions_ClearSuggestedUsers(InviteOptionsHandle);
     for (FString User : SuggestedUserList)
@@ -99,14 +93,11 @@ bool FPicoPresenceInterface::ReadInvitableUser(TArray<FString> SuggestedUserList
     );
     ppf_InviteOptions_Destroy(InviteOptionsHandle);
     return true;
-#endif
-    return false;
 }
 
 void FPicoPresenceInterface::OnQueryReadInvitableUserComplete(ppfMessageHandle Message, bool bIsError, TMap<FString, TSharedRef<FOnlinePicoFriend>>& OutList, bool bAppendToExistingMap, const FOnReadInvitableUserComplete& Delegate)
 {
     UE_LOG(PresenceInterface, Log, TEXT("FPicoPresenceInterface::OnQueryReadInvitableUserComplete"));
-#if PLATFORM_ANDROID
     FString ErrorStr;
     if (bIsError)
     {
@@ -169,7 +160,6 @@ void FPicoPresenceInterface::OnQueryReadInvitableUserComplete(ppfMessageHandle M
     {
         Delegate.ExecuteIfBound(true, ErrorStr);
     }
-#endif
 }
 
 bool FPicoPresenceInterface::GetInvitableFriendList(TArray<TSharedRef<FOnlinePicoFriend>>& OutFriends)
@@ -181,7 +171,6 @@ bool FPicoPresenceInterface::GetInvitableFriendList(TArray<TSharedRef<FOnlinePic
 bool FPicoPresenceInterface::PresenceSet(const FString& ApiName, const FString& LobbySessionId, const FString& MatchSessionId, bool bIsJoinable, const FString& Extra, const FOnPresenceSetComplete& Delegate /*= FOnPresenceSetComplete()*/)
 {
     UE_LOG(PresenceInterface, Log, TEXT("FPicoPresenceInterface::PresenceSet"));
-#if PLATFORM_ANDROID
     auto PresenceOptions = ppf_PresenceOptions_Create();
     ppf_PresenceOptions_SetDestinationApiName(PresenceOptions, TCHAR_TO_UTF8(*ApiName));
     ppf_PresenceOptions_SetLobbySessionId(PresenceOptions, TCHAR_TO_UTF8(*LobbySessionId));
@@ -201,15 +190,12 @@ bool FPicoPresenceInterface::PresenceSet(const FString& ApiName, const FString& 
     );
     ppf_PresenceOptions_Destroy(PresenceOptions);
     return true;
-#endif
-    return false;
 
 }
 
 void FPicoPresenceInterface::OnQueryPresenceSetComplete(ppfMessageHandle Message, bool bIsError, const FOnPresenceSetComplete& Delegate)
 {
     UE_LOG(PresenceInterface, Log, TEXT("FPicoPresenceInterface::OnQueryPresenceSetComplete"));
-#if PLATFORM_ANDROID
     FString ErrorStr;
     if (bIsError)
     {
@@ -223,14 +209,11 @@ void FPicoPresenceInterface::OnQueryPresenceSetComplete(ppfMessageHandle Message
     {
         Delegate.ExecuteIfBound(true, FString());
     }
-#endif
 }
 
 bool FPicoPresenceInterface::PresenceSetDestination(const FString& ApiName, const FOnPresenceSetDestinationComplete& Delegate /*= FOnPresenceSetDestinationComplete()*/)
 {
     UE_LOG(PresenceInterface, Log, TEXT("FPicoPresenceInterface::PresenceSetDestination"));
-#if PLATFORM_ANDROID
-
     PicoSubsystem.AddAsyncTask
     (
         ppf_Presence_SetDestination(TCHAR_TO_UTF8(*ApiName)),
@@ -243,14 +226,11 @@ bool FPicoPresenceInterface::PresenceSetDestination(const FString& ApiName, cons
         )
     );
     return true;
-#endif
-    return false;
 }
 
 void FPicoPresenceInterface::OnQueryPresenceSetDestinationComplete(ppfMessageHandle Message, bool bIsError, const FOnPresenceSetDestinationComplete& Delegate)
 {
     UE_LOG(PresenceInterface, Log, TEXT("FPicoPresenceInterface::OnQueryPresenceSetDestinationComplete"));
-#if PLATFORM_ANDROID
     FString ErrorStr;
     if (bIsError)
     {
@@ -264,14 +244,11 @@ void FPicoPresenceInterface::OnQueryPresenceSetDestinationComplete(ppfMessageHan
     {
         Delegate.ExecuteIfBound(true, FString());
     }
-#endif
 }
 
 bool FPicoPresenceInterface::PresenceSetSetIsJoinable(bool bIsJoinable, const FOnPresenceSetIsJoinableComplete& Delegate /*= FOnPresenceSetIsJoinableComplete()*/)
 {
     UE_LOG(PresenceInterface, Log, TEXT("FPicoPresenceInterface::PresenceSetSetIsJoinable"));
-#if PLATFORM_ANDROID
-
     PicoSubsystem.AddAsyncTask
     (
         ppf_Presence_SetIsJoinable(bIsJoinable),
@@ -284,14 +261,11 @@ bool FPicoPresenceInterface::PresenceSetSetIsJoinable(bool bIsJoinable, const FO
         )
     );
     return true;
-#endif
-    return false;
 }
 
 void FPicoPresenceInterface::OnQueryPresenceSetSetIsJoinableComplete(ppfMessageHandle Message, bool bIsError, const FOnPresenceSetIsJoinableComplete& Delegate)
 {
     UE_LOG(PresenceInterface, Log, TEXT("FPicoPresenceInterface::OnQueryPresenceSetSetIsJoinableComplete"));
-#if PLATFORM_ANDROID
     FString ErrorStr;
     if (bIsError)
     {
@@ -305,14 +279,11 @@ void FPicoPresenceInterface::OnQueryPresenceSetSetIsJoinableComplete(ppfMessageH
     {
         Delegate.ExecuteIfBound(true, FString());
     }
-#endif
 }
 
 bool FPicoPresenceInterface::PresenceSetLobbySession(const FString& LobbySession, const FOnPresenceSetLobbySessionComplete& Delegate /*= FOnPresenceSetLobbySessionComplete()*/)
 {
     UE_LOG(PresenceInterface, Log, TEXT("FPicoPresenceInterface::PresenceSetLobbySession"));
-#if PLATFORM_ANDROID
-
     PicoSubsystem.AddAsyncTask
     (
         ppf_Presence_SetLobbySession(TCHAR_TO_UTF8(*LobbySession)),
@@ -325,14 +296,11 @@ bool FPicoPresenceInterface::PresenceSetLobbySession(const FString& LobbySession
         )
     );
     return true;
-#endif
-    return false;
 }
 
 void FPicoPresenceInterface::OnQueryPresenceSetLobbySessionComplete(ppfMessageHandle Message, bool bIsError, const FOnPresenceSetLobbySessionComplete& Delegate)
 {
     UE_LOG(PresenceInterface, Log, TEXT("FPicoPresenceInterface::OnQueryPresenceSetLobbySessionComplete"));
-#if PLATFORM_ANDROID
     FString ErrorStr;
     if (bIsError)
     {
@@ -347,14 +315,11 @@ void FPicoPresenceInterface::OnQueryPresenceSetLobbySessionComplete(ppfMessageHa
     {
         Delegate.ExecuteIfBound(true, FString());
     }
-#endif
 }
 
 bool FPicoPresenceInterface::PresenceSetMatchSession(const FString& MatchSession, const FOnPresenceSetMatchSessionComplete& Delegate /*= FOnPresenceSetMatchSessionComplete()*/)
 {
     UE_LOG(PresenceInterface, Log, TEXT("FPicoPresenceInterface::PresenceSetMatchSession"));
-#if PLATFORM_ANDROID
-
     PicoSubsystem.AddAsyncTask
     (
         ppf_Presence_SetMatchSession(TCHAR_TO_UTF8(*MatchSession)),
@@ -367,14 +332,11 @@ bool FPicoPresenceInterface::PresenceSetMatchSession(const FString& MatchSession
         )
     );
     return true;
-#endif
-    return false;
 }
 
 void FPicoPresenceInterface::OnQueryPresenceSetMatchSessionComplete(ppfMessageHandle Message, bool bIsError, const FOnPresenceSetMatchSessionComplete& Delegate)
 {
     UE_LOG(PresenceInterface, Log, TEXT("FPicoPresenceInterface::OnQueryPresenceSetMatchSessionComplete"));
-#if PLATFORM_ANDROID
     FString ErrorStr;
     if (bIsError)
     {
@@ -388,14 +350,11 @@ void FPicoPresenceInterface::OnQueryPresenceSetMatchSessionComplete(ppfMessageHa
     {
         Delegate.ExecuteIfBound(true, FString());
     }
-#endif
 }
 
 bool FPicoPresenceInterface::PresenceSetExtra(const FString& Extra, const FOnPresenceSetPresenceExtraComplete& Delegate /*= FOnPresenceSetPresenceExtraComplete()*/)
 {
     UE_LOG(PresenceInterface, Log, TEXT("FPicoPresenceInterface::PresenceSetExtra"));
-#if PLATFORM_ANDROID
-
     PicoSubsystem.AddAsyncTask
     (
         ppf_Presence_SetExtra(TCHAR_TO_UTF8(*Extra)),
@@ -408,14 +367,11 @@ bool FPicoPresenceInterface::PresenceSetExtra(const FString& Extra, const FOnPre
         )
     );
     return true;
-#endif
-    return false;
 }
 
 void FPicoPresenceInterface::OnQueryPresenceSetExtraComplete(ppfMessageHandle Message, bool bIsError, const FOnPresenceSetPresenceExtraComplete& Delegate)
 {
     UE_LOG(PresenceInterface, Log, TEXT("FPicoPresenceInterface::OnQueryPresenceSetExtraComplete"));
-#if PLATFORM_ANDROID
     FString ErrorStr;
     if (bIsError)
     {
@@ -429,13 +385,11 @@ void FPicoPresenceInterface::OnQueryPresenceSetExtraComplete(ppfMessageHandle Me
     {
         Delegate.ExecuteIfBound(true, FString());
     }
-#endif
 }
 
 bool FPicoPresenceInterface::PresenceReadSendInvites(const FOnReadSentInvitesComplete& Delegate /*= FOnReadGetSentInvitesComplete()*/)
 {
     UE_LOG(PresenceInterface, Log, TEXT("FPicoPresenceInterface::PresenceReadSendInvites"));
-#if PLATFORM_ANDROID
     PicoSubsystem.AddAsyncTask
     (
         ppf_Presence_GetSentInvites(),
@@ -447,14 +401,12 @@ bool FPicoPresenceInterface::PresenceReadSendInvites(const FOnReadSentInvitesCom
             }
         )
     );
-#endif
-    return false;
+    return true;
 }
 
 void FPicoPresenceInterface::OnQueryPresenceReadSendInvitesComplete(ppfMessageHandle Message, bool bIsError, TArray<FPicoApplicationInvite>& OutList, bool bAppendToExistingMap, const FOnReadSentInvitesComplete& Delegate)
 {
     UE_LOG(PresenceInterface, Log, TEXT("FPicoPresenceInterface::OnQueryPresenceReadSendInvitesComplete"));
-#if PLATFORM_ANDROID
     FString ErrorStr;
     if (bIsError)
     {
@@ -486,7 +438,7 @@ void FPicoPresenceInterface::OnQueryPresenceReadSendInvitesComplete(ppfMessageHa
         bool bIsActive = ppf_ApplicationInvite_GetIsActive(ApplicationInviteElement);
         FString LobbySessionId = UTF8_TO_TCHAR(ppf_ApplicationInvite_GetLobbySessionId(ApplicationInviteElement));
         FString MatchSessionId = UTF8_TO_TCHAR(ppf_ApplicationInvite_GetMatchSessionId(ApplicationInviteElement));
-        auto ApplicationInviteElementUser = ppf_ApplicationInvite_GetRecipient(ApplicationInviteElement);       
+        auto ApplicationInviteElementUser = ppf_ApplicationInvite_GetRecipient(ApplicationInviteElement);
         FString FriendId = UTF8_TO_TCHAR(ppf_User_GetID(ApplicationInviteElementUser));
         FString FriendDisplayName = UTF8_TO_TCHAR(ppf_User_GetDisplayName(ApplicationInviteElementUser));
         auto FriendInviteToken = ppf_User_GetInviteToken(ApplicationInviteElementUser);
@@ -527,7 +479,7 @@ void FPicoPresenceInterface::OnQueryPresenceReadSendInvitesComplete(ppfMessageHa
         PicoApplicationInvite.Recipent = Friend;
         PicoApplicationInvite.bIsActive = bIsActive;
         PicoApplicationInvite.Destination = Destination;
-//        PicoApplicationInvite.Id = ID;
+        //        PicoApplicationInvite.Id = ID;
         PicoApplicationInvite.ID = StrID;
         PicoApplicationInvite.LobbySessionId = LobbySessionId;
         PicoApplicationInvite.MatchSessionId = MatchSessionId;
@@ -553,7 +505,6 @@ void FPicoPresenceInterface::OnQueryPresenceReadSendInvitesComplete(ppfMessageHa
     {
         Delegate.ExecuteIfBound(true, ErrorStr);
     }
-#endif
 }
 
 bool FPicoPresenceInterface::GetSendInvitesList(TArray<FPicoApplicationInvite>& OutList)
@@ -570,7 +521,6 @@ bool FPicoPresenceInterface::GetSendInvitesList(TArray<FPicoApplicationInvite>& 
 bool FPicoPresenceInterface::PresenceGetDestinations(const FOnGetDestinationsComplete& Delegate /*= FOnGetDestinationsComplete()*/)
 {
     UE_LOG(PresenceInterface, Log, TEXT("FPicoPresenceInterface::PresenceGetDestinations"));
-#if PLATFORM_ANDROID
     PicoSubsystem.AddAsyncTask
     (
         ppf_Presence_GetDestinations(),
@@ -578,19 +528,16 @@ bool FPicoPresenceInterface::PresenceGetDestinations(const FOnGetDestinationsCom
         (
             [this, Delegate](ppfMessageHandle Message, bool bIsError)
             {
-                OnQueryGetDestinationsComplete(Message, bIsError,DestinationArray, /*bAppendToExistingMap */ false, Delegate);
+                OnQueryGetDestinationsComplete(Message, bIsError, DestinationArray, /*bAppendToExistingMap */ false, Delegate);
             }
         )
     );
     return true;
-#endif
-    return false;
 }
 
 void FPicoPresenceInterface::OnQueryGetDestinationsComplete(ppfMessageHandle Message, bool bIsError, TArray<FPicoDestination>& OutList, bool bAppendToExistingArray, const FOnGetDestinationsComplete& Delegate)
 {
     UE_LOG(PresenceInterface, Log, TEXT("FPicoPresenceInterface::OnQueryGetDestinationsComplete"));
-#if PLATFORM_ANDROID
     FString ErrorStr;
     if (bIsError)
     {
@@ -615,7 +562,7 @@ void FPicoPresenceInterface::OnQueryGetDestinationsComplete(ppfMessageHandle Mes
         Destination.ApiName = UTF8_TO_TCHAR(ppf_Destination_GetApiName(DestinationArrayElement));
         Destination.DeepLinkMessage = UTF8_TO_TCHAR(ppf_Destination_GetDeeplinkMessage(DestinationArrayElement));
         Destination.DisplayName = UTF8_TO_TCHAR(ppf_Destination_GetDisplayName(DestinationArrayElement));
-        
+
         OutList.Add(Destination);
     }
     bool bHasPaging = ppf_DestinationArray_HasNextPage(GetDestinationArray);
@@ -638,7 +585,6 @@ void FPicoPresenceInterface::OnQueryGetDestinationsComplete(ppfMessageHandle Mes
     {
         Delegate.ExecuteIfBound(true, ErrorStr);
     }
-#endif
 }
 
 bool FPicoPresenceInterface::PresenceGetDestnationsList(TArray<FPicoDestination>& OutList)
@@ -652,6 +598,80 @@ bool FPicoPresenceInterface::PresenceGetDestnationsList(TArray<FPicoDestination>
     return false;
 }
 
+bool FPicoPresenceInterface::LaunchInvitePanel(const FOnLaunchInvitePanelComplete& Delegate /*= FOnLaunchInvitePanelComplete()*/)
+{
+    UE_LOG(PresenceInterface, Log, TEXT("FPicoPresenceInterface::LaunchInvitePanel"));
+#if PLATFORM_ANDROID
+    ppfRequest RequestId = ppf_Presence_LaunchInvitePanel();
+    PicoSubsystem.AddAsyncTask(RequestId, FPicoMessageOnCompleteDelegate::CreateLambda(
+        [Delegate, this](ppfMessageHandle Message, bool bIsError)
+        {
+            if (bIsError)
+            {
+                auto Error = ppf_Message_GetError(Message);
+                FString ErrorMessage = UTF8_TO_TCHAR(ppf_Error_GetMessage(Error));
+                UE_LOG(PresenceInterface, Log, TEXT("LaunchInvitePanel return failed:%s"), *ErrorMessage);
+                Delegate.ExecuteIfBound(false, ErrorMessage);
+            }
+            else
+            {
+                UE_LOG(PresenceInterface, Log, TEXT("LaunchInvitePanel return Sucessed"));
+                Delegate.ExecuteIfBound(true, FString());
+            }
+        }));
+    return true;
+#endif
+    return false;
+}
+
+bool FPicoPresenceInterface::ShareMedia(EShareMediaType InMediaType, const FString& InVideoPath, const FString& InVideoThumbPath, TArray<FString> InImagePaths, EShareAppTyp InShareType, const FOnShareMediaComplete& Delegate /*= FOnShareMediaComplete()*/)
+{
+    UE_LOG(PresenceInterface, Log, TEXT("FPicoPresenceInterface::ShareMedia"));
+    if (InMediaType == EShareMediaType::None || InShareType == EShareAppTyp::None)
+    {
+        return false;
+    }
+#if PLATFORM_ANDROID
+    auto ShareMediaOptions = ppf_ShareMediaOptions_Create();
+    if (InMediaType == EShareMediaType::Video)
+    {
+        ppf_ShareMediaOptions_SetShareMediaType(ShareMediaOptions, ppfShareMediaType_Video);
+    }
+    else if (InMediaType == EShareMediaType::Image)
+    {
+        ppf_ShareMediaOptions_SetShareMediaType(ShareMediaOptions, ppfShareMediaType_Image);
+    }
+    ppf_ShareMediaOptions_SetVideoPath(ShareMediaOptions, TCHAR_TO_UTF8(*InVideoPath));
+    ppf_ShareMediaOptions_SetVideoThumbPath(ShareMediaOptions, TCHAR_TO_UTF8(*InVideoThumbPath));
+    for (FString Each : InImagePaths)
+    {
+        ppf_ShareMediaOptions_AddImagePath(ShareMediaOptions, TCHAR_TO_UTF8(*Each));
+    }
+    ppf_ShareMediaOptions_SetShareAppType(ShareMediaOptions, ppfShareAppType_Douyin);
+
+    ppfRequest RequestId = ppf_Presence_ShareMedia(ShareMediaOptions);
+    PicoSubsystem.AddAsyncTask(RequestId, FPicoMessageOnCompleteDelegate::CreateLambda(
+        [Delegate, this](ppfMessageHandle Message, bool bIsError)
+        {
+            if (bIsError)
+            {
+                auto Error = ppf_Message_GetError(Message);
+                FString ErrorMessage = UTF8_TO_TCHAR(ppf_Error_GetMessage(Error));
+                UE_LOG(PresenceInterface, Log, TEXT("ShareMedia return failed:%s"), *ErrorMessage);
+                Delegate.ExecuteIfBound(false, ErrorMessage);
+            }
+            else
+            {
+                UE_LOG(PresenceInterface, Log, TEXT("ShareMedia return Sucessed"));
+                Delegate.ExecuteIfBound(true, FString());
+            }
+        }));
+    ppf_ShareMediaOptions_Destroy(ShareMediaOptions);
+    return true;
+#endif
+    return false;
+}
+
 void FPicoPresenceInterface::OnJoinIntentReceiveResult(ppfMessageHandle Message, bool bIsError)
 {
     if (bIsError)
@@ -659,14 +679,12 @@ void FPicoPresenceInterface::OnJoinIntentReceiveResult(ppfMessageHandle Message,
         UE_LOG(PresenceInterface, Error, TEXT("OnJoinIntentReceiveResult error!"));
         return;
     }
-#if PLATFORM_ANDROID
     auto PresenceJoinIntent = ppf_Message_GetPresenceJoinIntent(Message);
     FString DeeplinkMessage = UTF8_TO_TCHAR((ppf_PresenceJoinIntent_GetDeeplinkMessage(PresenceJoinIntent)));
     FString DestinationApiName = UTF8_TO_TCHAR((ppf_PresenceJoinIntent_GetDestinationApiName(PresenceJoinIntent)));
     FString LobbySessionId = UTF8_TO_TCHAR((ppf_PresenceJoinIntent_GetLobbySessionId(PresenceJoinIntent)));
     FString MatchSessionId = UTF8_TO_TCHAR((ppf_PresenceJoinIntent_GetMatchSessionId(PresenceJoinIntent)));
     JoinIntentReceivedCallback.Broadcast(DeeplinkMessage, DestinationApiName, LobbySessionId, MatchSessionId);
-#endif
 }
 
 void FPicoPresenceInterface::OnLeaveIntentReceiveResult(ppfMessageHandle Message, bool bIsError)
@@ -676,20 +694,17 @@ void FPicoPresenceInterface::OnLeaveIntentReceiveResult(ppfMessageHandle Message
         UE_LOG(PresenceInterface, Error, TEXT("OnLeaveIntentReceiveResult error!"));
         return;
     }
-#if PLATFORM_ANDROID
     auto PresenceLeaveIntent = ppf_Message_GetPresenceLeaveIntent(Message);
     FString DestinationApiName = UTF8_TO_TCHAR((ppf_PresenceLeaveIntent_GetDestinationApiName(PresenceLeaveIntent)));
     FString LobbySessionId = UTF8_TO_TCHAR((ppf_PresenceLeaveIntent_GetLobbySessionId(PresenceLeaveIntent)));
     FString MatchSessionId = UTF8_TO_TCHAR((ppf_PresenceLeaveIntent_GetMatchSessionId(PresenceLeaveIntent)));
 
     LeaveIntentReceivedCallback.Broadcast(DestinationApiName, LobbySessionId, MatchSessionId);
-#endif
 }
 
 bool FPicoPresenceInterface::PresenceSendInvites(TArray<FString> UserIdArray, const FOnSentInvitesComplete& Delegate /*= FOnSentInvitesComplete()*/)
 {
     UE_LOG(PresenceInterface, Log, TEXT("FPicoPresenceInterface::PresenceSentInvites"));
-#if PLATFORM_ANDROID
     int32 Length = UserIdArray.Num();
     std::vector<std::string> StringArray;
     for (size_t i = 0; i < UserIdArray.Num(); i++)
@@ -713,14 +728,11 @@ bool FPicoPresenceInterface::PresenceSendInvites(TArray<FString> UserIdArray, co
         )
     );
     return true;
-#endif
-    return false;
 }
 
 void FPicoPresenceInterface::OnQuerySendInvitesComplete(ppfMessageHandle Message, bool bIsError, TArray<FPicoApplicationInvite>& OutList, bool bAppendToExistingMap, const FOnSentInvitesComplete& Delegate)
 {
     UE_LOG(PresenceInterface, Log, TEXT("FPicoPresenceInterface::OnQuerySendInvitesComplete"));
-#if PLATFORM_ANDROID
     FString ErrorStr;
     if (bIsError)
     {
@@ -790,12 +802,12 @@ void FPicoPresenceInterface::OnQuerySendInvitesComplete(ppfMessageHandle Message
         Friend.UserPresenceStatus = PresenceStatus;
         Friend.UserId = FriendId;
         FPicoApplicationInvite PicoApplicationInvite;
- //       PicoApplicationInvite.Recipent = OnlineFriend;
+        //       PicoApplicationInvite.Recipent = OnlineFriend;
         PicoApplicationInvite.Recipent = Friend;
         PicoApplicationInvite.ID = StrID;
         PicoApplicationInvite.bIsActive = bIsActive;
         PicoApplicationInvite.Destination = Destination;
-//        PicoApplicationInvite.Id = ID;
+        //        PicoApplicationInvite.Id = ID;
         PicoApplicationInvite.LobbySessionId = LobbySessionId;
         PicoApplicationInvite.MatchSessionId = MatchSessionId;
         OutList.Add(PicoApplicationInvite);
@@ -820,14 +832,4 @@ void FPicoPresenceInterface::OnQuerySendInvitesComplete(ppfMessageHandle Message
     {
         Delegate.ExecuteIfBound(true, ErrorStr);
     }
-#endif
 }
-
-//void FPicoPresenceInterface::SentPack(void* Data)
-//{
-//#if PLATFORM_ANDROID
-//    const uint8 * DataToSend = reinterpret_cast<uint8*>(Data);
-//    FString TT = TEXT("");
-//    ppf_Net_SendPacket(TCHAR_TO_UTF8(*TT), 6, DataToSend);
-//#endif
-//}

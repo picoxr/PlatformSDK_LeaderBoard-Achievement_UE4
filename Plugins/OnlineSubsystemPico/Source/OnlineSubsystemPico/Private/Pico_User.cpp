@@ -113,7 +113,7 @@ bool UOnlinePicoUserFunction::GetAuthorizePermissions(UObject* WorldContextObjec
     }
     else
     {
-        UE_LOG(PicoUser, Log, TEXT("GetPicoUserInfo Failed, PicoUserInterface Not Vailed!"));
+        UE_LOG(PicoUser, Log, TEXT("GetAuthorizePermissions Failed, PicoUserInterface Not Vailed!"));
         OnGetPermissionResultCallback.ExecuteIfBound(true, FString(TEXT("PicoUserInterface Not Vailed")), nullptr);
         return false;
     }
@@ -128,8 +128,39 @@ bool UOnlinePicoUserFunction::RequestUserPermissions(UObject* WorldContextObject
     }
     else
     {
-        UE_LOG(PicoUser, Log, TEXT("GetPicoUserInfo Failed, PicoUserInterface Not Vailed!"));
+        UE_LOG(PicoUser, Log, TEXT("RequestUserPermissions Failed, PicoUserInterface Not Vailed!"));
         OnGetPermissionResultCallback.ExecuteIfBound(true, FString(TEXT("PicoUserInterface Not Vailed")), nullptr);
+        return false;
+    }
+}
+
+
+bool UOnlinePicoUserFunction::LaunchFriendRequestFlow(UObject* WorldContextObject, const FString UserId, FLaunchFriendRequestResult OnLaunchFriendRequestResultCallback)
+{
+    FOnlineSubsystemPico* Subsystem = static_cast<FOnlineSubsystemPico*>(Online::GetSubsystem(GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull), PICO_SUBSYSTEM));
+    if (Subsystem && Subsystem->GetPicoUserInterface())
+    {
+        return Subsystem->GetPicoUserInterface()->LaunchFriendRequestFlow(UserId, OnLaunchFriendRequestResultCallback);
+    }
+    else
+    {
+        UE_LOG(PicoUser, Log, TEXT("LaunchFriendRequestFlow Failed, PicoUserInterface Not Vailed!"));
+        OnLaunchFriendRequestResultCallback.ExecuteIfBound(true, FString(TEXT("PicoUserInterface Not Vailed")), false, false);
+        return false;
+    }
+}
+
+bool UOnlinePicoUserFunction::GetAccessToken(UObject* WorldContextObject, FGetAccessTokenResult OnGetAccessTokenResultCallback)
+{
+    FOnlineSubsystemPico* Subsystem = static_cast<FOnlineSubsystemPico*>(Online::GetSubsystem(GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull), PICO_SUBSYSTEM));
+    if (Subsystem && Subsystem->GetPicoUserInterface())
+    {
+        return Subsystem->GetPicoUserInterface()->GetAccessToken(OnGetAccessTokenResultCallback);
+    }
+    else
+    {
+        UE_LOG(PicoUser, Log, TEXT("GetAccessToken Failed, PicoUserInterface Not Vailed!"));
+        OnGetAccessTokenResultCallback.ExecuteIfBound(true, FString(TEXT("PicoUserInterface Not Vailed")), FString());
         return false;
     }
 }
@@ -137,7 +168,7 @@ bool UOnlinePicoUserFunction::RequestUserPermissions(UObject* WorldContextObject
 void UPico_User::InitParams(ppfUser* ppfUserHandle)
 {
     UE_LOG(PicoUser, Log, TEXT("UPico_User::InitParams"));
-#if PLATFORM_ANDROID
+
     DisplayName = UTF8_TO_TCHAR(ppf_User_GetDisplayName(ppfUserHandle));
     ImageUrl = UTF8_TO_TCHAR(ppf_User_GetImageUrl(ppfUserHandle));
     ID = UTF8_TO_TCHAR(ppf_User_GetID(ppfUserHandle));
@@ -169,7 +200,7 @@ void UPico_User::InitParams(ppfUser* ppfUserHandle)
     PresenceMatchSessionId = UTF8_TO_TCHAR(ppf_User_GetPresenceMatchSessionId(ppfUserHandle));
     PresenceExtra = UTF8_TO_TCHAR(ppf_User_GetPresenceExtra(ppfUserHandle));
     StoreRegion = UTF8_TO_TCHAR(ppf_User_GetStoreRegion(ppfUserHandle));
-#endif
+
 }
 
 FString UPico_User::GetDisplayName()
@@ -218,7 +249,7 @@ FString UPico_User::GetPresence()
 }
 
 FString UPico_User::GetPresenceDeeplinkMessage()
-{   
+{
     return PresenceDeeplinkMessage;
 }
 
@@ -233,7 +264,7 @@ FString UPico_User::GetPresenceLobbySessionId()
 }
 
 FString UPico_User::GetPresenceMatchSessionId()
-{   
+{
     return PresenceMatchSessionId;
 }
 
@@ -250,7 +281,6 @@ FString UPico_User::GetStoreRegion()
 void UPico_UserArray::InitParams(ppfUserArray* InppfUserArrayHandle)
 {
     UE_LOG(PicoUser, Log, TEXT("UPico_UserArray::InitParams"));
-#if PLATFORM_ANDROID
     Size = ppf_UserArray_GetSize(InppfUserArrayHandle);
     for (int32 i = 0; i < Size; i++)
     {
@@ -265,7 +295,6 @@ void UPico_UserArray::InitParams(ppfUserArray* InppfUserArrayHandle)
     {
         NextPageParam = ppf_UserArray_GetNextPageParam(InppfUserArrayHandle);
     }
-#endif
 }
 
 UPico_User* UPico_UserArray::GetElement(int32 Index)
@@ -295,12 +324,10 @@ bool UPico_UserArray::HasNextPage()
 void UPico_UserAndRoom::InitParams(ppfUserAndRoom* InppfUserAndRoomHandle)
 {
     UE_LOG(PicoUser, Log, TEXT("UPico_UserAndRoom::InitParams"));
-#if PLATFORM_ANDROID
     Room = NewObject<UPico_Room>();
     Room->InitParams(ppf_UserAndRoom_GetRoom(InppfUserAndRoomHandle));
     User = NewObject<UPico_User>();
     User->InitParams(ppf_UserAndRoom_GetUser(InppfUserAndRoomHandle));
-#endif 
 }
 
 UPico_Room* UPico_UserAndRoom::GetRoom()
@@ -318,7 +345,6 @@ UPico_User* UPico_UserAndRoom::GetUser()
 void UPico_UserAndRoomArray::InitParams(ppfUserAndRoomArray* InppfUserAndRoomArrayHandle)
 {
     UE_LOG(PicoUser, Log, TEXT("UPico_UserAndRoomArray::InitParams"));
-#if PLATFORM_ANDROID
     Size = ppf_UserAndRoomArray_GetSize(InppfUserAndRoomArrayHandle);
     for (int32 i = 0; i < Size; i++)
     {
@@ -332,7 +358,6 @@ void UPico_UserAndRoomArray::InitParams(ppfUserAndRoomArray* InppfUserAndRoomArr
     {
         NextPageParam = ppf_UserAndRoomArray_GetNextPageParam(InppfUserAndRoomArrayHandle);
     }
-#endif
 }
 
 UPico_UserAndRoom* UPico_UserAndRoomArray::GetElement(int32 Index)
@@ -373,7 +398,6 @@ FPicoUserInterface::~FPicoUserInterface()
 bool FPicoUserInterface::GetLoginUser(FGetLoginUser InGetLoginUserDelegate)
 {
     UE_LOG(PicoUser, Log, TEXT("FPicoUserInterface::GetLoginUser"));
-#if PLATFORM_ANDROID
     ppfRequest RequestId = ppf_User_GetLoggedInUser();
     PicoSubsystem.AddAsyncTask(RequestId, FPicoMessageOnCompleteDelegate::CreateLambda(
         [InGetLoginUserDelegate, this](ppfMessageHandle Message, bool bIsError)
@@ -396,14 +420,11 @@ bool FPicoUserInterface::GetLoginUser(FGetLoginUser InGetLoginUserDelegate)
             }
         }));
     return true;
-#endif
-    return false;
 }
 
 bool FPicoUserInterface::GetUserInfo(const FString& UserId, FGetUserInfo InGetUserInfoDelegate)
 {
     UE_LOG(PicoUser, Log, TEXT("FPicoUserInterface::GetUserInfo"));
-#if PLATFORM_ANDROID
     ppfRequest RequestId = ppf_User_Get(TCHAR_TO_UTF8(*UserId));
     PicoSubsystem.AddAsyncTask(RequestId, FPicoMessageOnCompleteDelegate::CreateLambda(
         [InGetUserInfoDelegate, this](ppfMessageHandle Message, bool bIsError)
@@ -426,14 +447,11 @@ bool FPicoUserInterface::GetUserInfo(const FString& UserId, FGetUserInfo InGetUs
             }
         }));
     return true;
-#endif
-    return false;
 }
 
 bool FPicoUserInterface::GetLoggedInUserAndRoom(FGetLoggedInUserFriendsAndRooms InGetLoggedInuserFriendsAndRoomsCallback)
 {
     UE_LOG(PicoUser, Log, TEXT("FPicoUserInterface::GetLoggedInUserAndRoom"));
-#if PLATFORM_ANDROID
     ppfRequest RequestId = ppf_User_GetLoggedInUserFriendsAndRooms();
     PicoSubsystem.AddAsyncTask(RequestId, FPicoMessageOnCompleteDelegate::CreateLambda(
         [InGetLoggedInuserFriendsAndRoomsCallback, this](ppfMessageHandle Message, bool bIsError)
@@ -456,14 +474,11 @@ bool FPicoUserInterface::GetLoggedInUserAndRoom(FGetLoggedInUserFriendsAndRooms 
             }
         }));
     return true;
-#endif
-    return false;
 }
 
 bool FPicoUserInterface::GetNextUserAndRoomArrayPage(UPico_UserAndRoomArray* InUserAndRoomArray, FGetNextUserAndRoomArrayPage InGetNextUserAndRoomArrayPageCallback)
 {
     UE_LOG(PicoUser, Log, TEXT("FPicoUserInterface::GetNextUserAndRoomArrayPage"));
-#if PLATFORM_ANDROID
     ppfRequest RequestId = ppf_User_GetNextUserAndRoomArrayPage(TCHAR_TO_UTF8(*InUserAndRoomArray->GetNextPageParam()));
     PicoSubsystem.AddAsyncTask(RequestId, FPicoMessageOnCompleteDelegate::CreateLambda(
         [InGetNextUserAndRoomArrayPageCallback, this](ppfMessageHandle Message, bool bIsError)
@@ -486,14 +501,11 @@ bool FPicoUserInterface::GetNextUserAndRoomArrayPage(UPico_UserAndRoomArray* InU
             }
         }));
     return true;
-#endif
-    return false;
 }
 
 bool FPicoUserInterface::GetUserFriends(FGetLoggedInUserFriends InGetLoggedInUserFriendsCallback)
 {
     UE_LOG(PicoUser, Log, TEXT("FPicoUserInterface::GetUserFriends"));
-#if PLATFORM_ANDROID
     ppfRequest RequestId = ppf_User_GetLoggedInUserFriends();
     PicoSubsystem.AddAsyncTask(RequestId, FPicoMessageOnCompleteDelegate::CreateLambda(
         [InGetLoggedInUserFriendsCallback, this](ppfMessageHandle Message, bool bIsError)
@@ -516,14 +528,11 @@ bool FPicoUserInterface::GetUserFriends(FGetLoggedInUserFriends InGetLoggedInUse
             }
         }));
     return true;
-#endif
-    return false;
 }
 
 bool FPicoUserInterface::GetNextUserPage(UPico_UserArray* InUserArray, FGetNextUserPage OnGetNextUserPageCallback)
 {
     UE_LOG(PicoUser, Log, TEXT("FPicoUserInterface::GetNextUserPage"));
-#if PLATFORM_ANDROID
     ppfRequest RequestId = ppf_User_GetNextUserArrayPage(TCHAR_TO_UTF8(*InUserArray->GetNextPageParam()));
     PicoSubsystem.AddAsyncTask(RequestId, FPicoMessageOnCompleteDelegate::CreateLambda(
         [OnGetNextUserPageCallback, this](ppfMessageHandle Message, bool bIsError)
@@ -547,13 +556,66 @@ bool FPicoUserInterface::GetNextUserPage(UPico_UserArray* InUserArray, FGetNextU
             }
         }));
     return true;
-#endif
-    return false;
+}
+
+bool FPicoUserInterface::LaunchFriendRequestFlow(const FString UserId, FLaunchFriendRequestResult OnLaunchFriendRequestResultCallback)
+{
+    UE_LOG(PicoUser, Log, TEXT("FPicoUserInterface::LaunchFriendRequestFlow"));
+    ppfRequest RequestId = ppf_User_LaunchFriendRequestFlow(TCHAR_TO_UTF8(*UserId));
+    PicoSubsystem.AddAsyncTask(RequestId, FPicoMessageOnCompleteDelegate::CreateLambda(
+        [OnLaunchFriendRequestResultCallback, this](ppfMessageHandle Message, bool bIsError)
+        {
+            if (bIsError)
+            {
+                auto Error = ppf_Message_GetError(Message);
+                FString ErrorMessage = UTF8_TO_TCHAR(ppf_Error_GetMessage(Error));
+                UE_LOG(PicoUser, Log, TEXT("LaunchFriendRequestFlow return failed:%s"), *ErrorMessage);
+                this->LaunchFriendRequestDelegate.ExecuteIfBound(true, ErrorMessage, false, false);
+                OnLaunchFriendRequestResultCallback.ExecuteIfBound(true, ErrorMessage, false, false);
+            }
+            else
+            {
+                ppfMessageType messageType = ppf_Message_GetType(Message);
+                UE_LOG(PicoUser, Log, TEXT("LaunchFriendRequestFlow Successfully"));
+                auto LaunchFriendRequestFlowResult = ppf_Message_GetLaunchFriendRequestFlowResult(Message);
+                bool bDidCancel = ppf_LaunchFriendRequestFlowResult_GetDidCancel(LaunchFriendRequestFlowResult);
+                bool bDidSendRequest = ppf_LaunchFriendRequestFlowResult_GetDidSendRequest(LaunchFriendRequestFlowResult);
+                this->LaunchFriendRequestDelegate.ExecuteIfBound(false, FString(), bDidCancel, bDidSendRequest);
+                OnLaunchFriendRequestResultCallback.ExecuteIfBound(false, FString(), bDidCancel, bDidSendRequest);
+            }
+        }));
+    return true;
+}
+
+bool FPicoUserInterface::GetAccessToken(FGetAccessTokenResult OnGetAccessTokenResultCallback)
+{
+    UE_LOG(PicoUser, Log, TEXT("FPicoUserInterface::GetAccessToken"));
+    ppfRequest RequestId = ppf_User_GetAccessToken();
+    PicoSubsystem.AddAsyncTask(RequestId, FPicoMessageOnCompleteDelegate::CreateLambda(
+        [OnGetAccessTokenResultCallback, this](ppfMessageHandle Message, bool bIsError)
+        {
+            if (bIsError)
+            {
+                auto Error = ppf_Message_GetError(Message);
+                FString ErrorMessage = UTF8_TO_TCHAR(ppf_Error_GetMessage(Error));
+                UE_LOG(PicoUser, Log, TEXT("GetAccessToken return failed:%s"), *ErrorMessage);
+                this->GetAccesstokenDelegate.ExecuteIfBound(true, ErrorMessage, FString());
+                OnGetAccessTokenResultCallback.ExecuteIfBound(true, ErrorMessage, FString());
+            }
+            else
+            {
+                ppfMessageType messageType = ppf_Message_GetType(Message);
+                UE_LOG(PicoUser, Log, TEXT("GetAccessToken Successfully"));
+                FString AccessToken = ppf_Message_GetString(Message);
+                this->GetAccesstokenDelegate.ExecuteIfBound(false, FString(), AccessToken);
+                OnGetAccessTokenResultCallback.ExecuteIfBound(false, FString(), AccessToken);
+            }
+        }));
+    return true;
 }
 
 bool FPicoUserInterface::GetAuthorizePermissions(FGetPermissionResult OnGetPermissionResultCallback)
 {
-#if PLATFORM_ANDROID
     ppfRequest RequestId = ppf_User_GetAuthorizedPermissions();
     PicoSubsystem.AddAsyncTask(RequestId, FPicoMessageOnCompleteDelegate::CreateLambda(
         [OnGetPermissionResultCallback, this](ppfMessageHandle Message, bool bIsError)
@@ -565,7 +627,7 @@ bool FPicoUserInterface::GetAuthorizePermissions(FGetPermissionResult OnGetPermi
                 UE_LOG(PicoUser, Log, TEXT("GetAuthorizePermissions return failed:%s"), *ErrorMessage);
                 this->GetAuthorizePermissionsDelegate.ExecuteIfBound(true, ErrorMessage, nullptr);
                 OnGetPermissionResultCallback.ExecuteIfBound(true, ErrorMessage, nullptr);
-}
+            }
             else
             {
                 UE_LOG(PicoUser, Log, TEXT("GetAuthorizePermissions return Sucessed"));
@@ -576,13 +638,10 @@ bool FPicoUserInterface::GetAuthorizePermissions(FGetPermissionResult OnGetPermi
             }
         }));
     return true;
-#endif
-    return false;
 }
 
 bool FPicoUserInterface::RequestUserPermissions(TArray<FString> Permissions, FGetPermissionResult OnGetPermissionResultCallback)
 {
-#if PLATFORM_ANDROID
     int32 Size = Permissions.Num();
     std::vector<std::string> StringArray;
     for (size_t i = 0; i < Permissions.Num(); i++)
@@ -616,13 +675,10 @@ bool FPicoUserInterface::RequestUserPermissions(TArray<FString> Permissions, FGe
             }
         }));
     return true;
-#endif
-    return false;
 }
 
 void UPico_PermissionResult::InitParams(ppfPermissionResult* InppfPermissionResultHandle)
 {
-#if PLATFORM_ANDROID
     Size = ppf_PermissionResult_GetAuthorizedPermissionsSize(InppfPermissionResultHandle);
     for (int32 i = 0; i < Size; i++)
     {
@@ -631,7 +687,6 @@ void UPico_PermissionResult::InitParams(ppfPermissionResult* InppfPermissionResu
     }
     AccessionToken = UTF8_TO_TCHAR(ppf_PermissionResult_GetAccessToken(InppfPermissionResultHandle));
     UserID = UTF8_TO_TCHAR(ppf_PermissionResult_GetUserID(InppfPermissionResultHandle));
-#endif
 }
 
 FString UPico_PermissionResult::GetAuthorizedPermission(int32 Index)

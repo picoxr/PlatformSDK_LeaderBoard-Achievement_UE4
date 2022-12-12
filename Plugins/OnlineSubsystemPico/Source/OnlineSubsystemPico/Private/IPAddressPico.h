@@ -31,10 +31,10 @@ PACKAGE_SCOPE:
 	/**
 	* Copy Constructor
 	*/
-    FInternetAddrPico(const FInternetAddrPico& Src) :
-        PicoId(Src.PicoId)
-    {
-    }
+	FInternetAddrPico(const FInternetAddrPico& Src) :
+		PicoId(Src.PicoId)
+	{
+	}
 
 
 public:
@@ -80,10 +80,10 @@ public:
 		return FInternetAddrPico(*PicoNetId);
 	}
 #elif ENGINE_MINOR_VERSION > 26
-    FInternetAddrPico() :
-        PicoId(FUniqueNetIdPico::EmptyId())
-    {
-    }
+	FInternetAddrPico() :
+		PicoId(FUniqueNetIdPico::EmptyId())
+	{
+	}
 
 	/**
 * Constructor
@@ -117,10 +117,10 @@ public:
 	}
 
 #elif ENGINE_MINOR_VERSION > 24
-    FInternetAddrPico() :
-        PicoId(0ull)
-    {
-    }
+	FInternetAddrPico() :
+		PicoId(0ull)
+	{
+	}
 
 	/**
 	* Constructor
@@ -155,61 +155,61 @@ public:
 
 
 #if ENGINE_MAJOR_VERSION > 4
-    ppfID GetID() const
-    {
-        return PicoId->GetID();
-    }
-    FString GetStrID() const
-    {
-        return PicoId->GetStringID();
-    }
+	ppfID GetID() const
+	{
+		return PicoId->GetID();
+	}
+	FString GetStrID() const
+	{
+		return PicoId->GetStringID();
+	}
 #elif ENGINE_MINOR_VERSION > 26
-    ppfID GetID() const
-    {
-        return PicoId->GetID();
-}
-    FString GetStrID() const
-    {
-        return PicoId->GetStringID();
-    }
+	ppfID GetID() const
+	{
+		return PicoId->GetID();
+	}
+	FString GetStrID() const
+	{
+		return PicoId->GetStringID();
+	}
 #elif ENGINE_MINOR_VERSION > 24
-    ppfID GetID() const
-    {
-        return PicoId.GetID();
-    }
-    FString GetStrID() const
-    {
-        return PicoId.GetStringID();
-    }
+	ppfID GetID() const
+	{
+		return PicoId.GetID();
+	}
+	FString GetStrID() const
+	{
+		return PicoId.GetStringID();
+	}
 #endif
 
 	virtual TArray<uint8> GetRawIp() const override
 	{
 #if ENGINE_MAJOR_VERSION > 4
-        TArray<uint8> RawAddressArray;
-        const uint8* PicoIdWalk = PicoId->GetBytes();
-        while (RawAddressArray.Num() < PicoId->GetSize())
-        {
-            RawAddressArray.Add(*PicoIdWalk);
-            ++PicoIdWalk;
-        }
+		TArray<uint8> RawAddressArray;
+		const uint8* PicoIdWalk = PicoId->GetBytes();
+		while (RawAddressArray.Num() < PicoId->GetSize())
+		{
+			RawAddressArray.Add(*PicoIdWalk);
+			++PicoIdWalk;
+		}
 #elif ENGINE_MINOR_VERSION > 26
-        TArray<uint8> RawAddressArray;
-        const uint8* PicoIdWalk = PicoId->GetBytes();
-        while (RawAddressArray.Num() < PicoId->GetSize())
-        {
-            RawAddressArray.Add(*PicoIdWalk);
-            ++PicoIdWalk;
-        }
+		TArray<uint8> RawAddressArray;
+		const uint8* PicoIdWalk = PicoId->GetBytes();
+		while (RawAddressArray.Num() < PicoId->GetSize())
+		{
+			RawAddressArray.Add(*PicoIdWalk);
+			++PicoIdWalk;
+		}
 
 #elif ENGINE_MINOR_VERSION > 24
-        TArray<uint8> RawAddressArray;
-        const uint8* PicoIdWalk = PicoId.GetBytes();
-        while (RawAddressArray.Num() < PicoId.GetSize())
-        {
-            RawAddressArray.Add(*PicoIdWalk);
-            ++PicoIdWalk;
-        }
+		TArray<uint8> RawAddressArray;
+		const uint8* PicoIdWalk = PicoId.GetBytes();
+		while (RawAddressArray.Num() < PicoId.GetSize())
+		{
+			RawAddressArray.Add(*PicoIdWalk);
+			++PicoIdWalk;
+		}
 #endif
 
 

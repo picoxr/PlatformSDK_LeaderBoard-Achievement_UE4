@@ -40,6 +40,8 @@ DECLARE_MULTICAST_DELEGATE_TwoParams(FOnRoomUpdateDataStoreComplete, const FStri
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnRoomUpdateMembershipLockStatusComplete, const FString& /*RoomID*/, bool /*bWasSuccessful*/);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnRoomUpdateComplete, const FString& /*RoomID*/, bool /*bWasSuccessful*/);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnRoomInviteAcceptedComplete, const FString& /*RoomID*/, bool /*bWasSuccessful*/);
+DECLARE_MULTICAST_DELEGATE_FourParams(FOnPicoSessionUserInviteAcceptedComplete, const bool /*bWasSuccessful*/, const int32 /*ControllerId*/, const FString& /*UserId*/, const FPicoOnlineSessionSearchResult& /*InviteResult*/);
+
 
 
 /** @addtogroup Function Function
@@ -47,8 +49,8 @@ DECLARE_MULTICAST_DELEGATE_TwoParams(FOnRoomInviteAcceptedComplete, const FStrin
  *  @{
  */
 
-/** @defgroup Session Session
- *  This is the Session group
+/** @defgroup Session Session(OnlineSub)
+ *  This is the Session(OnlineSub) group
  *  @{
  */
 
@@ -324,6 +326,7 @@ PACKAGE_SCOPE:
 	void OnGetAccessTokenComplete(ppfMessageHandle Message, bool bIsError);
 	void OnGameInitializeComplete(ppfMessageHandle Message, bool bIsError);
 
+	// todo 这些是否可删
 	FDelegateHandle OnNetNotificationConnectionHandle;
 	void OnNetNotificationConnection(ppfMessageHandle Message, bool bIsError);
 
@@ -402,7 +405,8 @@ public:
 	bool IsInMatchmakingProgress();
 
 	FOnRoomUpdateComplete RoomUpdateCallback;
-	FOnRoomInviteAcceptedComplete RoomInviteAcceptedCallback;
+	FOnRoomInviteAcceptedComplete RoomInviteAcceptedCallback; // todo 可删
+	FOnPicoSessionUserInviteAcceptedComplete PicoSessionUserInviteAcceptedCallback; // todo 用这个还是用 RoomInviteAcceptedCallback
 
 	FOnGameConnectionComplete GameConnectionCallback;
 	FOnGameRequestFailedComplete GameRequestFailedCallback;
@@ -425,6 +429,6 @@ public:
 	void TestDumpSession(const FOnlineSession* Session) const;
 	void TestDumpSessionSettings(const FOnlineSessionSettings* SessionSettings) const;
 };
-/** @} */ // end of Session
+/** @} */ // end of Session(OnlineSub)
 /** @} */ // end of Function
 typedef TSharedPtr<FOnlineSessionPico, ESPMode::ThreadSafe> FOnlineSessionPicoPtr;

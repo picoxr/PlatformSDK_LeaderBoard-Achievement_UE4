@@ -150,6 +150,9 @@ typedef enum
     PXR_SET_DESIRED_FPS,
     PXR_GET_SEETHROUGH_STATE,
     PXR_SET_LAYER_BLEND,
+    PXR_LEFT_EYE_FOV,
+    PXR_RIGHT_EYE_FOV,
+    PXR_BOTH_EYE_FOV,
 } PxrConfigType;
 
 typedef enum

@@ -455,6 +455,7 @@ private:
     TArray<UPico_AchievementProgress*> AchievementProgressArray;
     FString NextPageParam = FString();
     int32 Size = 0;
+    int32 TotalSize = 0;
     bool bHasNextPage;
 public:
     void InitParams(ppfAchievementProgressArrayHandle InppfAchievementProgressArrayHandle);
@@ -467,6 +468,9 @@ public:
 
     UFUNCTION(BlueprintPure, Category = "Pico Platform|Achievements|Achievement Progress Array")
     int32 GetSize();
+    
+    UFUNCTION(BlueprintPure, Category = "Pico Platform|Achievements|Achievement Progress Array")
+    int32 GetTotalSize();
 
     UFUNCTION(BlueprintPure, Category = "Pico Platform|Achievements|Achievement Progress Array")
     bool HasNextPage();
@@ -481,6 +485,7 @@ private:
     TArray<UPico_AchievementDefinition*> AchievementDefinitionArray;
     FString NextPageParam = FString();
     int32 Size = 0;
+    int32 TotalSize = 0;
     bool bHasNextPage;
 
 public:
@@ -494,6 +499,9 @@ public:
 
     UFUNCTION(BlueprintPure, Category = "Pico Platform|Achievements|Achievement Definition Array")
         int32 GetSize();
+    
+    UFUNCTION(BlueprintPure, Category = "Pico Platform|Achievements|Achievement Definition Array")
+        int32 GetTotalSize();
 
     UFUNCTION(BlueprintPure, Category = "Pico Platform|Achievements|Achievement Definition Array")
         bool HasNextPage();

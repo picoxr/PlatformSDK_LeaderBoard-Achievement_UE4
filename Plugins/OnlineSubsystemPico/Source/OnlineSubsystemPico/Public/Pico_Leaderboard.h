@@ -30,7 +30,7 @@ public:
 	Pico_OnlineLeaderboardRead(const FString& InLeaderboardName, int PageIndex, int PageSize)
 	{
 		PicoLeaderboardName = InLeaderboardName;
-		LeaderboardName = FName(InLeaderboardName);
+		// LeaderboardName = FName(InLeaderboardName);
 		PicoPageIndex = PageIndex;
 		PicoPageSize = PageSize;
 	}

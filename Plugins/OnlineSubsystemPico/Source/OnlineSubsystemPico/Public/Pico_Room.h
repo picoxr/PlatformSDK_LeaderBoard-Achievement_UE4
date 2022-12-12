@@ -63,9 +63,7 @@ public:
     UFUNCTION(BlueprintPure, Category = "Pico Platform|Room|Room")
     FString GetDescription();
 
-#if PLATFORM_ANDROID
     ppfID GetppfID();
-#endif
 
     UFUNCTION(BlueprintPure, Category = "Pico Platform|Room|Room")
     FString GetRoomID();

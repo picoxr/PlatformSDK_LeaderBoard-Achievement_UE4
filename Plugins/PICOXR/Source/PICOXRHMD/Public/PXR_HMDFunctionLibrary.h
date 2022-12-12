@@ -5,6 +5,7 @@
 #include <array>
 #include "HeadMountedDisplayTypes.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "PXR_HMDTypes.h"
 #include "PXR_HMDFunctionLibrary.generated.h"
 
 class UTexture2D;
@@ -490,21 +491,18 @@ public:
 	*/
 	 UFUNCTION(BlueprintCallable, Category = "PXR|PXRHMD")
 		 static FPICOXREyeTrackingData PXR_GetEyeTrackingData();
-	
-     UFUNCTION(BlueprintCallable, Category = "PXR|PXRHMD")
-         static void PXR_EnableEyeTrackingMarker(bool Enable);
 
 	 UFUNCTION(BlueprintCallable, Category = "PXR|PXRHMD")
 		 static bool PXR_GetEyeTrackingPos(FVector &EyeTrackingPos);
 
 	 //UFUNCTION(BlueprintCallable, Category = "PXR|PXRHMD")
-		 static bool PXR_GetFaceTrackingData(int64 Ts, int Flags, int64& TimeStamp, TArray<float>& BlendShapeWeight, TArray<float>& Reserved);
+		 static bool PXR_GetFaceTrackingData(int64 InTimeStamp, int64& OutTimeStamp, TArray<float>& BlendShapeWeight, TArray<float>& VideoInputValid, float &LaughingProb, TArray<float>& EmotionProb, TArray<float>& Reserved);
 
 	 UFUNCTION(BlueprintCallable, Category = "PXR|PXRHMD")
 		 static bool PXR_EnableEyeTracking(bool enable);
 
 	 //UFUNCTION(BlueprintCallable, Category = "PXR|PXRHMD")
-		 static bool PXR_EnableFaceTracking(bool enable);
+		 static bool PXR_EnableFaceTracking(EPICOXRFaceTrackingMode FaceTrackingMode);
 
 #pragma endregion FaceOrEyeTracking
 	

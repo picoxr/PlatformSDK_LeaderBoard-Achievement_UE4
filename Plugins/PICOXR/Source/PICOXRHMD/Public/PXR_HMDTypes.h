@@ -46,3 +46,12 @@ struct FPXRSplashDesc
 	{
 	}
 };
+
+UENUM(BlueprintType)
+enum class EPICOXRFaceTrackingMode : uint8
+{
+	Disable,
+	FaceOnly,
+	LipsOnly,
+	FaceAndLips,
+};

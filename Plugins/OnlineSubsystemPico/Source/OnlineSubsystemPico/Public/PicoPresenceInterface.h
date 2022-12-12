@@ -8,7 +8,9 @@
 #include "OnlineSubsystemPico.h"
 #include "OnlineSubsystemPicoPackage.h"
 #include "OnlineSubsystemPicoNames.h"
-#include "OnlineFriendsInterfacePico.h"
+
+
+class FOnlinePicoFriend;
 
 /// @file PicoPresenceInterface.h
 
@@ -21,6 +23,8 @@
  *  This is the Presence group
  *  @{
  */
+
+
 
 DECLARE_LOG_CATEGORY_EXTERN(PresenceInterface, Log, All);
 
@@ -36,6 +40,9 @@ DECLARE_DELEGATE_TwoParams(FOnPresenceSetPresenceExtraComplete, bool /*IsSuccess
 DECLARE_DELEGATE_TwoParams(FOnReadSentInvitesComplete, bool /*IsSuccessed*/, const FString& /*Error Message*/);
 DECLARE_DELEGATE_TwoParams(FOnSentInvitesComplete, bool /*IsSuccessed*/, const FString& /*Error Message*/);
 DECLARE_DELEGATE_TwoParams(FOnGetDestinationsComplete, bool /*IsSuccessed*/, const FString& /*Error Message*/);
+DECLARE_DELEGATE_TwoParams(FOnLaunchInvitePanelComplete, bool /*IsSuccessed*/, const FString& /*Error Message*/);
+DECLARE_DELEGATE_TwoParams(FOnShareMediaComplete, bool /*IsSuccessed*/, const FString& /*Error Message*/);
+
 
 DECLARE_MULTICAST_DELEGATE_FourParams(FJoinIntentReceived, const FString& /*DeeplinkMessage*/, const FString& /*DestinationApiName*/, const FString&/*LobbySessionId*/, const FString& /*MatchSessionId*/);
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FLeaveIntentReceived, const FString& /*DestinationApiName*/, const FString&/*LobbySessionId*/, const FString& /*MatchSessionId*/);
@@ -247,6 +254,44 @@ public:
     /// </ul>
     /// </returns>
 	bool PresenceGetDestnationsList(TArray<FPicoDestination>& OutList);
+
+    /// <summary>Call up the system panel to invite friends.</summary>
+    /// <param name="Delegate">Will be executed when the request has been completed.</param>
+    /// <returns>Bool:
+    /// * `true`: success
+    /// * `false`: failure
+    /// </returns>
+    bool LaunchInvitePanel(const FOnLaunchInvitePanelComplete& Delegate = FOnLaunchInvitePanelComplete());
+
+    /// <summary>Share videos or images to Douyin (a video app in Mainland China). Currently, this function is available in Mainland China only.
+    /// @note
+    /// * Video file requirements:
+    /// For a better viewing experience, it is recommended to upload a 16:9 vertical video with a resolution of 720p(1280x720) and above
+    /// Support common video formats, mp4 and webm are recommended.
+    /// The video file size should not exceed 128M and the duration should be within 15 minutes.
+    /// Videos over 50m are recommended to be uploaded in multiple segments, and the total video size should be within 4GB. A single shard is recommended to be 20MB, with a minimum of 5MB.
+    /// * Image file requirements :
+    /// The total size of the picture does not exceed 100M
+    /// Up to 35 sheets at a time
+    /// </summary>
+    /// <param name="InMediaType">The media type:
+    /// * `0`: Video
+    /// * `1`: Image
+    /// * `2`: None
+    /// </param>
+    /// <param name="InVideoPath">The path to the video file.</param> 
+    /// <param name="InVideoThumbPath">The path to the video thumbnail. If not defined, the first frame of the video will become the video thumbnail.</param> 
+    /// <param name="InImagePaths">The array of image paths.</param> 
+    /// <param name="InShareType">The share type:
+    /// * `0`: Douyin
+    /// * `1`: None
+    /// </param>
+    /// <param name="Delegate">Will be executed when the request has been completed.</param>
+    /// <returns>Bool:
+    /// * `true`: success
+    /// * `false`: failure
+    /// </returns>
+    bool ShareMedia(EShareMediaType InMediaType, const FString& InVideoPath, const FString& InVideoThumbPath, TArray<FString> InImagePaths, EShareAppTyp InShareType, const FOnShareMediaComplete& Delegate = FOnShareMediaComplete());
 	
 PACKAGE_SCOPE:
 

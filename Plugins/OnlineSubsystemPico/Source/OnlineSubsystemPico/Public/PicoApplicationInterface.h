@@ -16,10 +16,10 @@
  *  @{
  */
 
-/** @defgroup ApplicationLifecycle ApplicationLifecycle
- *  This is the ApplicationLifecycle group
- *  @{
- */
+ /** @defgroup Application Application
+  *  This is the Application group
+  *  @{
+  */
 
 DECLARE_LOG_CATEGORY_EXTERN(ApplicationInterface, Log, All);
 
@@ -27,21 +27,22 @@ DECLARE_LOG_CATEGORY_EXTERN(ApplicationInterface, Log, All);
 DECLARE_DELEGATE_ThreeParams(FOnLaunchOtherAppComplete, const FString& /*String Message*/, bool /*IsSuccessed*/, const FString& /*Error Message*/);
 DECLARE_DELEGATE_ThreeParams(FOnLaunchOtherAppByPresenceComplete, const FString& /*String Message*/, bool /*IsSuccessed*/, const FString& /*Error Message*/);
 DECLARE_DELEGATE_ThreeParams(FOnGetVersion, const FString& /*String Message*/, bool /*IsSuccessed*/, const FString& /*Error Message*/);
+DECLARE_DELEGATE_ThreeParams(FOnLaunchOtherAppByAppIdComplete, const FString& /*String Message*/, bool /*IsSuccessed*/, const FString& /*Error Message*/);
 
-// <summary>Pico Application interface class.</summary>
+/// <summary>Pico Application interface class.</summary>
 class ONLINESUBSYSTEMPICO_API FPicoApplicationInterface
 {
 private:
 
-	FOnlineSubsystemPico& PicoSubsystem;
+    FOnlineSubsystemPico& PicoSubsystem;
 
 public:
-	FPicoApplicationInterface(FOnlineSubsystemPico& InSubsystem);
-	~FPicoApplicationInterface();
+    FPicoApplicationInterface(FOnlineSubsystemPico& InSubsystem);
+    ~FPicoApplicationInterface();
 
     /// <summary>
     /// Launches a different app in a user's library.
-    /// @note If the user does not have that app installed, the user will be directed to that app's page on the Pico Store.
+    /// @note If the user does not have that app installed, the user will be directed to that app's page on the PICO Store.
     /// </summary>
     /// <param name ="PackageName">The package name of the app to launch.</param> 
     /// <param name ="Message">A message to be passed to the launched app.</param> 
@@ -52,15 +53,15 @@ public:
     /// <li>`false`: failure</li>
     /// </ul>
     /// </returns>
-	bool LaunchOtherApp(const FString &PackageName, const FString &Message, const FOnLaunchOtherAppComplete& Delegate = FOnLaunchOtherAppComplete());
-	void OnQueryLaunchOtherAppComplete(ppfMessageHandle Message, bool bIsError, const FOnLaunchOtherAppComplete& Delegate);
+    bool LaunchOtherApp(const FString& PackageName, const FString& Message, const FOnLaunchOtherAppComplete& Delegate = FOnLaunchOtherAppComplete());
+    void OnQueryLaunchOtherAppComplete(ppfMessageHandle Message, bool bIsError, const FOnLaunchOtherAppComplete& Delegate);
 
-	bool GetVersion(const FOnGetVersion& Delegate = FOnGetVersion());
-	void OnQueryGetVersionComplete(ppfMessageHandle Message, bool bIsError, const FOnGetVersion& Delegate);
+    bool GetVersion(const FOnGetVersion& Delegate = FOnGetVersion());
+    void OnQueryGetVersionComplete(ppfMessageHandle Message, bool bIsError, const FOnGetVersion& Delegate);
 
     /// <summary>
     /// Launches a different app in a user's library.
-    /// @note If the user does not have that app installed, the user will be directed to that app's page in the PICO Store.
+    /// @note If the user does not have that app installed, the user will be directed to that app's page on the PICO Store.
     /// </summary>
     /// <param name ="AppID">The ID of the app to launch.</param> 
     /// <param name ="PackageName">The package name of the app to launch.</param> 
@@ -80,6 +81,21 @@ public:
     bool LaunchOtherAppByPresence(const FString& AppID, const FString& PackageName, const FString& Message, const FString& ApiName, const FString& LobbySessionId, const FString& MatchSessionId, const FString& TrackId, const FString& Extra, const FOnLaunchOtherAppByPresenceComplete& Delegate = FOnLaunchOtherAppByPresenceComplete());
     void OnQueryLaunchOtherAppByPresenceComplete(ppfMessageHandle Message, bool bIsError, const FOnLaunchOtherAppByPresenceComplete& Delegate);
 
+    /// <summary>
+    /// Launches a different app in a user's library by app ID.
+    /// @note If the user does not have that app installed, the user will be directed to that app's page on the PICO Store.
+    /// </summary>
+    /// <param name ="AppId">The ID of the app to launch.</param> 
+    /// <param name ="Message">A message to be passed to the launched app.</param> 
+    /// <param name ="Delegate">Will be executed when the request has been complete.</param> 
+    /// <returns>Bool: 
+    /// <ul>
+    /// <li>`true`: success</li>
+    /// <li>`false`: failure</li>
+    /// </ul>
+    /// </returns>
+    bool LaunchOtherAppByAppId(const FString& AppId, const FString& Message, const FOnLaunchOtherAppByAppIdComplete& Delegate = FOnLaunchOtherAppByAppIdComplete());
+    void OnQueryLaunchOtherAppByAppIdComplete(ppfMessageHandle Message, bool bIsError, const FOnLaunchOtherAppByAppIdComplete& Delegate);
 };
-/** @} */ // end of ApplicationLifecycle
+/** @} */ // end of Application
 /** @} */ // end of Function

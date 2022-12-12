@@ -14,130 +14,147 @@
 #endif
 class UPico_UserArray;
 
+/// @file OnlineSubsystemPicoNames.h
+
+ /** @defgroup Data Data
+  *  This is the Data group
+  *  @{
+  */
+
+
+/// <summary>User's current online status.</summary>
 UENUM(BlueprintType)
 enum class EUserPresenceStatus : uint8
 {
-    Unknow,
-    OnLine,
-    OffLine
+    Unknow, /**< Unknow */
+    OnLine, /**< OnLine */
+    OffLine /**< OffLine */
 };
 
-
+/// <summary>User's gender.</summary>
 UENUM(BlueprintType)
 enum class EUserGender : uint8
 {
-    Unknow,
-    Male,
-    Female
+    Unknow, /**< Unknow */
+    Male, /**< Male */
+    Female /**< Female */
 };
 
+/// <summary>User's information.</summary>
 USTRUCT(BlueprintType, meta = (DisplayName = "OnlinePicoUserInfo"))
 struct FPicoUserInfo
 {
     GENERATED_USTRUCT_BODY()
 
     UPROPERTY(BlueprintReadWrite, Category = "OnlinePicoUserInfo")
-    FString UserId;
+    FString UserId; /*!< User's id */ 
 
     UPROPERTY(BlueprintReadWrite, Category = "OnlinePicoUserInfo")
-    FString DisplayName;
+    FString DisplayName; /*!< User's displayName */ 
 
     UPROPERTY(BlueprintReadWrite, Category = "OnlinePicoUserInfo")
-    EUserPresenceStatus UserPresenceStatus;
+    EUserPresenceStatus UserPresenceStatus; /*!< User's current online status */ 
 
     UPROPERTY(BlueprintReadWrite, Category = "OnlinePicoUserInfo")
-    FString InviteToken;
+    FString InviteToken; /*!< User's invite token */
 
     UPROPERTY(BlueprintReadWrite, Category = "OnlinePicoUserInfo")
-    FString ImageUrl;
+    FString ImageUrl; /*!< User's image url */
 
     UPROPERTY(BlueprintReadWrite, Category = "OnlinePicoUserInfo")
-    FString SmallImageUrl;
+    FString SmallImageUrl; /*!< User's small image url */
 
     UPROPERTY(BlueprintReadWrite, Category = "OnlinePicoUserInfo")
-    FString PresencePackage;
+    FString PresencePackage; /*!< The package name of the application corresponding to the presence */
 
     UPROPERTY(BlueprintReadWrite, Category = "OnlinePicoUserInfo")
-    FString PresenceStr;
+    FString PresenceStr; /*!< The name of the user's current presence */
 
     UPROPERTY(BlueprintReadWrite, Category = "OnlinePicoUserInfo")
-    FString PresenceDeeplinkMessage;
+    FString PresenceDeeplinkMessage; /*!< User's presence deeplink message */
 
     UPROPERTY(BlueprintReadWrite, Category = "OnlinePicoUserInfo")
-    FString PresenceDestinationApiName;
+    FString PresenceDestinationApiName; /*!< User's presence destination api name */
 
     UPROPERTY(BlueprintReadWrite, Category = "OnlinePicoUserInfo")
-    FString PresenceLobbySessionId;
+    FString PresenceLobbySessionId; /*!< User's presence lobby session id */
 
     UPROPERTY(BlueprintReadWrite, Category = "OnlinePicoUserInfo")
-    FString PresenceMatchSessionId;
+    FString PresenceMatchSessionId; /*!< User's presence lobby match id */
 
     UPROPERTY(BlueprintReadWrite, Category = "OnlinePicoUserInfo")
-    FString PresenceExtra;
+    FString PresenceExtra; /*!< User's presence extra */
 
     UPROPERTY(BlueprintReadWrite, Category = "OnlinePicoUserInfo")
-    EUserGender Gender;
+    EUserGender Gender; /*!< User's presence gender */
 };
 
 /* ppf_LaunchType.h */
+
+/// <summary>Launch type.</summary>
 UENUM(BlueprintType, meta = (DisplayName = "LaunchType"))
 enum class ELaunchType : uint8
 {
-    Unknown,
-    Normal,
-    Invite,
-    Coordinated,
-    Deeplink
+    Unknown, /**< Unknow */
+    Normal, /**< Normal */
+    Invite, /**< Invite */
+    Coordinated, /**< Coordinated */
+    Deeplink /**< Deeplink */
 };
 
 /* ppf_LaunchResult.h */
+
+/// <summary>Launch result.</summary>
 UENUM(BlueprintType, meta = (DisplayName = "LaunchResult"))
 enum class ELaunchResult : uint8
 {
-    Unknown,
-    Success,
-    FailedRoomFull,
-    FailedGameAlreadyStarted,
-    FailedRoomNotFound,
-    FailedUserDeclined,
-    FailedOtherReason
+    Unknown, /**< Unknow */
+    Success, /**< Success */
+    FailedRoomFull, /**< Room full */
+    FailedGameAlreadyStarted, /**< Game already started*/
+    FailedRoomNotFound, /**< Room not found */
+    FailedUserDeclined, /**< User declined */
+    FailedOtherReason /**< Other reason */
 };
 
 /* ppf_LaunchDetails.h */
+
+/// <summary>Launch details when successed.</summary>
 USTRUCT(BlueprintType, meta = (DisplayName = "LaunchDetails"))
 struct FLaunchDetails
 {
     GENERATED_USTRUCT_BODY()
 
     UPROPERTY(BlueprintReadWrite, Category = "ApplicationLifecycle")
-    FString DeeplinkMessage;
+    FString DeeplinkMessage; /*!< The deeplink message */ 
 
     UPROPERTY(BlueprintReadWrite, Category = "ApplicationLifecycle")
-    FString DestinationApiName;
+    FString DestinationApiName; /*!< The destination api name */ 
 
     UPROPERTY(BlueprintReadWrite, Category = "ApplicationLifecycle")
-    FString LaunchSource;
+    FString LaunchSource; /*!< The launch source */ 
 
     UPROPERTY(BlueprintReadWrite, Category = "ApplicationLifecycle")
-    FString LobbySessionID;
+    FString LobbySessionID; /*!< The lobby session id */ 
 
     UPROPERTY(BlueprintReadWrite, Category = "ApplicationLifecycle")
-    FString MatchSessionID;
+    FString MatchSessionID; /*!< The match session id */ 
 
     UPROPERTY(BlueprintReadWrite, Category = "ApplicationLifecycle")
-    FString Extra;
+    FString Extra; /*!< The presence extra info */ 
 
     UPROPERTY(BlueprintReadWrite, Category = "ApplicationLifecycle")
-    FString RoomID;
+    FString RoomID; /*!< The room id */ 
 
     UPROPERTY(BlueprintReadWrite, Category = "ApplicationLifecycle")
-    FString TrackingID;
+    FString TrackingID; /*!< The tracking id */ 
 
     UPROPERTY(BlueprintReadWrite, Category = "ApplicationLifecycle")
-    ELaunchType LaunchType;
+    ELaunchType LaunchType; /*!< The launch type */ 
+
 
     UPROPERTY(BlueprintReadWrite, Category = "ApplicationLifecycle")
-    UPico_UserArray* UserArray = nullptr;
+    UPico_UserArray* UserArray = nullptr; /*!< The user array for launch */ 
 
 };
 
@@ -173,48 +190,45 @@ enum class ERoomJoinabilit : uint8
     JoinabilityPolicyPrevents
 };
 
+/// <summary>The destination information.</summary>
 USTRUCT(BlueprintType, meta = (DisplayName = "PicoDestination"))
 struct FPicoDestination
 {
     GENERATED_USTRUCT_BODY()
 
     UPROPERTY(BlueprintReadWrite, Category = "Destination")
-    FString ApiName;
+    FString ApiName; /*!< The destination api name */ 
 
     UPROPERTY(BlueprintReadWrite, Category = "Destination")
-    FString DeepLinkMessage;
+    FString DeepLinkMessage; /*!< The destination deeplink message*/ 
 
     UPROPERTY(BlueprintReadWrite, Category = "Destination")
-    FString DisplayName;
+    FString DisplayName; /*!< The destination display name */ 
 };
 
-
+/// <summary>The application invite information.</summary>
 USTRUCT(BlueprintType, meta = (DisplayName = "PicoApplicationInvite"))
 struct FPicoApplicationInvite
 {
     GENERATED_USTRUCT_BODY()
-    //	FPicoRecipent Recipent;
-    UPROPERTY(BlueprintReadWrite, Category = "Destination")
-    FPicoUserInfo Recipent;
-//    TSharedRef<FOnlinePicoFriend> Recipent;
-    UPROPERTY(BlueprintReadWrite, Category = "Destination")
-    FPicoDestination Destination;
 
     UPROPERTY(BlueprintReadWrite, Category = "Destination")
-    FString ID;
-
-//    ppfID Id;
+    FPicoUserInfo Recipent; /*!< Information about the person who accepted the invitation */ 
 
     UPROPERTY(BlueprintReadWrite, Category = "Destination")
-    bool bIsActive;
+    FPicoDestination Destination; /*!< The destination information */
 
     UPROPERTY(BlueprintReadWrite, Category = "Destination")
-    FString LobbySessionId;
+    FString ID; /*!< The application invite id */
 
     UPROPERTY(BlueprintReadWrite, Category = "Destination")
-    FString MatchSessionId;
+    bool bIsActive; /*!< Whether the app invite is active */
 
-//    FPicoApplicationInvite(TSharedRef<FOnlinePicoFriend> InRecipent) : Recipent(InRecipent) {}
+    UPROPERTY(BlueprintReadWrite, Category = "Destination")
+    FString LobbySessionId; /*!< The lobby session id */ 
+
+    UPROPERTY(BlueprintReadWrite, Category = "Destination")
+    FString MatchSessionId; /*!< The match session id */ 
 };
 
 UENUM(BlueprintType)
@@ -225,6 +239,7 @@ enum class EOnlineAsyncTaskStatePicoType : uint8
     Done,
     Failed
 };
+
 UENUM(BlueprintType)
 enum class EOnJoinSessionCompleteResultPicoType : uint8
 {
@@ -235,6 +250,7 @@ enum class EOnJoinSessionCompleteResultPicoType : uint8
     AlreadyInSession,
     UnknownError
 };
+
 UENUM(BlueprintType)
 enum class EOnlineSessionStatePicoType : uint8
 {
@@ -532,6 +548,21 @@ enum class EAssetFileDownloadCompleteStatus : uint8
     Unkonw
 };
 
+UENUM(BlueprintType)
+enum class EShareMediaType : uint8
+{
+    Video,
+    Image,
+    None
+};
+
+UENUM(BlueprintType)
+enum class EShareAppTyp : uint8
+{
+    Douyin,
+    None
+};
+
 inline uint64 FStringTouint64(FString InStr)
 {
     return FCString::Strtoui64(*InStr, NULL, 10);
@@ -541,3 +572,63 @@ inline FString uint64ToFString(uint64 Inuint64)
 {
     return FString::Printf(TEXT("%llu"), Inuint64);
 };
+
+
+// Challenge
+UENUM(BlueprintType)
+enum class EChallengeCreationType : uint8
+{
+    Unknown,
+    UserCreated,
+    DeveloperCreated
+};
+
+UENUM(BlueprintType)
+enum class EChallengeVisibility : uint8
+{
+    Unknown,
+    InviteOnly,
+    Public,
+    Private
+};
+UENUM(BlueprintType)
+enum class EChallengeViewerFilter : uint8 {
+    Unknown,
+    AllVisible,
+    Participating,
+    Invited,
+    ParticipatingOrInvited
+};
+
+// Leaderboard
+UENUM(BlueprintType)
+enum class ELeaderboardStartAt : uint8
+{
+    Top,
+    CenteredOnViewer,
+    CenteredOnViewerOrTop,
+    Unknown
+};
+
+UENUM(BlueprintType)
+enum class ELeaderboardFilterType : uint8
+{
+    None,
+    Friends,
+    Unknown,
+    UserIds
+};
+
+USTRUCT(BlueprintType, meta = (DisplayName = "PicoSupplementaryMetric"))
+struct FPicoSupplementaryMetric
+{
+    GENERATED_USTRUCT_BODY()
+
+    UPROPERTY(BlueprintReadWrite, Category = "SupplementaryMetric")
+    FString ID;
+
+    UPROPERTY(BlueprintReadWrite, Category = "SupplementaryMetric")
+    FString Metric;
+};
+
+/** @} */ // end of Data

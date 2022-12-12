@@ -372,17 +372,6 @@ FPICOXREyeTrackingData UPICOXRHMDFunctionLibrary::PXR_GetEyeTrackingData()
     return EyeTrackingData;
 }
 
-void UPICOXRHMDFunctionLibrary::PXR_EnableEyeTrackingMarker(bool Enable)
-{
-#if PLATFORM_ANDROID
-	UPICOXRSettings *PICOSettings = GetMutableDefault<UPICOXRSettings>();
-	if (PICOSettings)
-	{
-		PICOSettings->bEnableEyeTrackingMarker = Enable;
-	}
-#endif
-}
-
 bool UPICOXRHMDFunctionLibrary::PXR_GetEyeTrackingPos(FVector &EyeTrackingPos)
 {
 #if PLATFORM_ANDROID
@@ -399,15 +388,15 @@ bool UPICOXRHMDFunctionLibrary::PXR_GetEyeTrackingPos(FVector &EyeTrackingPos)
 	return false;
 }
 
-bool UPICOXRHMDFunctionLibrary::PXR_GetFaceTrackingData(int64 Ts, int Flags, int64& TimeStamp, TArray<float>& BlendShapeWeight, TArray<float>& Reserved)
+bool UPICOXRHMDFunctionLibrary::PXR_GetFaceTrackingData(int64 InTimeStamp, int64& OutTimeStamp, TArray<float>& BlendShapeWeight, TArray<float>& VideoInputValid, float &LaughingProb, TArray<float>& EmotionProb, TArray<float>& Reserved)
 {
 #if PLATFORM_ANDROID
-	if (GetMutableDefault<UPICOXRSettings>()->bEnableFaceTracking)
+	if (GetMutableDefault<UPICOXRSettings>()->FaceTrackingMode != EPICOXRFaceTrackingMode::Disable)
 	{
 		const TSharedPtr<FPICOXREyeTracker> FaceOrTracker = GetPICOXRHMD()->UPxr_GetEyeTracker();
 		if (FaceOrTracker)
 		{
-            return FaceOrTracker->GetFaceTrackingData(Ts, Flags, TimeStamp, BlendShapeWeight, Reserved);
+			return FaceOrTracker->GetFaceTrackingData(InTimeStamp, OutTimeStamp, BlendShapeWeight, VideoInputValid, LaughingProb, EmotionProb, Reserved);
 		}
 	}
 #endif
@@ -416,20 +405,22 @@ bool UPICOXRHMDFunctionLibrary::PXR_GetFaceTrackingData(int64 Ts, int Flags, int
 
 bool UPICOXRHMDFunctionLibrary::PXR_EnableEyeTracking(bool enable)
 {
+#if PLATFORM_ANDROID
 	const TSharedPtr<FPICOXREyeTracker> FaceOrEyeTracker = GetPICOXRHMD()->UPxr_GetEyeTracker();
 	if (FaceOrEyeTracker)
 	{
 		return FaceOrEyeTracker->EnableEyeTracking(enable);
 	}
+#endif
 	return false;
 }
 
-bool UPICOXRHMDFunctionLibrary::PXR_EnableFaceTracking(bool enable)
+bool UPICOXRHMDFunctionLibrary::PXR_EnableFaceTracking(EPICOXRFaceTrackingMode FaceTrackingMode)
 {
-    const TSharedPtr<FPICOXREyeTracker> FaceOrEyeTracker = GetPICOXRHMD()->UPxr_GetEyeTracker();
+	const TSharedPtr<FPICOXREyeTracker> FaceOrEyeTracker = GetPICOXRHMD()->UPxr_GetEyeTracker();
 	if (FaceOrEyeTracker)
 	{
-		return FaceOrEyeTracker->EnableFaceTracking(enable);
+		return FaceOrEyeTracker->EnableFaceTracking(FaceTrackingMode);
 	}
 	return false;
 }

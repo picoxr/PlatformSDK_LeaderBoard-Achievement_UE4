@@ -14,10 +14,10 @@
  *  @{
  */
 
-/** @defgroup ApplicationLifecycle ApplicationLifecycle
- *  This is the ApplicationLifecycle group
- *  @{
- */
+ /** @defgroup ApplicationLifecycle ApplicationLifecycle
+  *  This is the ApplicationLifecycle group
+  *  @{
+  */
 DECLARE_LOG_CATEGORY_EXTERN(ApplicationLifecycleInterface, Log, All);
 
 
@@ -29,14 +29,14 @@ class ONLINESUBSYSTEMPICO_API FApplicationLifecycleInterface
 {
 
 private:
-	FLaunchDetails LaunchDetails;
+    FLaunchDetails LaunchDetails;
     FOnlineSubsystemPico& PicoSubsystem;
-	TArray<FPicoUserInfo> DetailsUserArray;
+    TArray<FPicoUserInfo> DetailsUserArray;
 public:
-	FApplicationLifecycleInterface(FOnlineSubsystemPico& InSubsystem);
-	~FApplicationLifecycleInterface();
+    FApplicationLifecycleInterface(FOnlineSubsystemPico& InSubsystem);
+    ~FApplicationLifecycleInterface();
 
-	bool ReadLaunchDetails();
+    bool ReadLaunchDetails();
 
     /// <summary>Gets information about how the app was launched.</summary>
     /// <param name ="OutLaunchDetails">The [out] struct of launch details.</param> 
@@ -44,7 +44,7 @@ public:
     /// * `true`: success
     /// * `false`: failure
     /// </returns>
-	bool GetLaunchDetails(FLaunchDetails& OutLaunchDetails);
+    bool GetLaunchDetails(FLaunchDetails& OutLaunchDetails);
 
     /// <summary>Logs whether the user has been successfully directed to the desired destination via a deep link.</summary>
     /// <param name ="TrackingID">The tracking ID of the app launch event.</param> 
@@ -61,14 +61,14 @@ public:
     /// * `true`: the result has been logged
     /// * `false`: failed to log the result
     /// </returns>
-	bool LogDeeplinkResult(const FString& TrackingID, ELaunchResult LaunchResult);
+    bool LogDeeplinkResult(const FString& TrackingID, ELaunchResult LaunchResult);
 
     FDelegateHandle OnLaunchIntentChangedNotificationHandle;
     void OnLaunchIntentChangedNotification(ppfMessageHandle Message, bool bIsError);
 
 public:
-	/// @brief Gets notified when the launch intent has been changed.
-	FApplicationLifecycleStringResult LaunchIntentChangedCallback;
+    /// @brief Gets notified when the launch intent has been changed.
+    FApplicationLifecycleStringResult LaunchIntentChangedCallback;
 };
 
 

@@ -14,7 +14,7 @@
 #include "OnlineSubsystemPicoTypes.h"
 
 /**
-/// 
+///
  */
 
  /// @file OnlineIdentityPico.h
@@ -102,12 +102,12 @@ private:
  *  @{
  */
 
-/** @defgroup Identity Identity
- *  This is the Identity group
- *  @{
- */
+ /** @defgroup Identity Identity(OnlineSub)
+  *  This is the Identity(OnlineSub) group
+  *  @{
+  */
 
-/// @brief OnlineIdentityPico class inherited from IOnlineIdentity(Unreal Engine)
+  /// @brief OnlineIdentityPico class inherited from IOnlineIdentity(Unreal Engine)
 class FOnlineIdentityPico : public IOnlineIdentity
 {
 public:
@@ -234,7 +234,7 @@ public:
 
     // Not Supported
     virtual void GetUserPrivilege(const FUniqueNetId& UserId, EUserPrivileges::Type Privilege, const FOnGetUserPrivilegeCompleteDelegate& Delegate) override;
-    
+
     // Not Supported
     virtual FPlatformUserId GetPlatformUserIdFromUniqueNetId(const FUniqueNetId& UniqueNetId) const override;
 
@@ -287,6 +287,6 @@ private:
 #endif
 
 };
-/** @} */ // end of Identity
+/** @} */ // end of Identity(OnlineSub)
 /** @} */ // end of Function
 typedef TSharedPtr<FOnlineIdentityPico, ESPMode::ThreadSafe> FOnlineIdentityPicoPtr;

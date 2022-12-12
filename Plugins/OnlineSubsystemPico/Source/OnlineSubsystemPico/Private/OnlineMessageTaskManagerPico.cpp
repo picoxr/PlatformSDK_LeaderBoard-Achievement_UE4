@@ -16,7 +16,6 @@ FString FOnlineAsyncTaskPico::ToString() const
 
 FString FOnlineAsyncEventPico::ToString() const
 {
-#if PLATFORM_ANDROID
     if (MessageHandle)
     {
         auto MessageType = ppf_Message_GetType(MessageHandle);
@@ -29,13 +28,11 @@ FString FOnlineAsyncEventPico::ToString() const
     {
         return TEXT("Message Error");
     }
-#endif
     return FString();
 }
 
 void FOnlineAsyncTaskPico::Tick()
 {
-#if PLATFORM_ANDROID
     if (RequestId != ppfMessageType_User_GetAccessToken)
     {
         if (GetElapsedTime() >= 10.f)
@@ -44,9 +41,6 @@ void FOnlineAsyncTaskPico::Tick()
             bWasSuccessful = false;
         }
     }
-
-
-#endif
 }
 
 void FOnlineAsyncTaskPico::Finalize()
@@ -74,7 +68,6 @@ void FOnlineAsyncTaskPico::TaskReceiveMessage(ppfMessageHandle InMessageHandle, 
         bWasSuccessful = false;
         UE_LOG_ONLINE(Log, TEXT("Wrong Message Handle return!"));
     }
-#if PLATFORM_ANDROID
     if (bWasSuccessful)
     {
         Delegate.ExecuteIfBound(MessageHandle, bIsError);
@@ -82,7 +75,6 @@ void FOnlineAsyncTaskPico::TaskReceiveMessage(ppfMessageHandle InMessageHandle, 
         ppf_FreeMessage(MessageHandle);
         MessageHandle = nullptr;
     }
-#endif
 }
 
 void FOnlineAsyncTaskManagerPico::OnlineTick()
@@ -91,7 +83,6 @@ void FOnlineAsyncTaskManagerPico::OnlineTick()
 
 void FOnlineAsyncTaskManagerPico::TickTask()
 {
-#if PLATFORM_ANDROID
     for (;;)
     {
         ppfMessageHandle MessageHandle = ppf_PopMessage();
@@ -126,7 +117,6 @@ void FOnlineAsyncTaskManagerPico::TickTask()
         }
         ppf_FreeMessage(MessageHandle);
     }
-#endif
 }
 
 void FOnlineAsyncTaskManagerPico::CollectedRequestTask(ppfRequest Request, FOnlineAsyncTaskPico* InTask)

@@ -60,8 +60,6 @@ FPICOXRInput::FPICOXRInput()
 	if (UPICOXRInputFunctionLibrary::IsHandTrackingEnabled())
 	{
 		bHandTrackingAvailable = true;
-		//Todo:It is planned to be removed in the SDK in the future
-		SetAppHandTrackingEnabled(true);
 	}
 }
 
@@ -448,7 +446,7 @@ EPICOXRActiveInputDevice FPICOXRInput::GetActiveInputDevice()
 bool FPICOXRInput::IsHandTrackingStateValid() const
 {
 	bool State = false;
-#if PLATFORM_ANDROID
+#if PLATFORM_ANDROID&&PLATFORM_64BITS
 	if (CurrentVersion  >= 0x2000306)
 	{
 		Pxr_GetHandTrackerSettingState(&State);
@@ -1283,7 +1281,7 @@ void FPICOXRInput::UpdateHandState()
 	}
 
 	const float WorldToMetersScale = PICOXRHMD->GetWorldToMetersScale();
-#if PLATFORM_ANDROID
+#if PLATFORM_ANDROID&&PLATFORM_64BITS
 	//Update HandState
 	for (int hand = 0; hand < 2; ++hand)
 	{
@@ -1335,7 +1333,7 @@ void FPICOXRInput::UpdateHandState()
 
 void FPICOXRInput::SetAppHandTrackingEnabled(bool Enabled)
 {
-#if PLATFORM_ANDROID
+#if PLATFORM_ANDROID&&PLATFORM_64BITS
 	if (CurrentVersion  >= 0x2000306)
 	{
 		Pxr_SetAppHandTrackingEnabled(Enabled);

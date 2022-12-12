@@ -18,6 +18,9 @@ FPICOXREyeTracker::FPICOXREyeTracker()
     ,bFaceTrackingRun(false)
 {
     FMemory::Memzero(TrackerData);
+#if PLATFORM_ANDROID
+	FMemory::Memzero(faceTrackingData);
+#endif
 }
 
 FPICOXREyeTracker::~FPICOXREyeTracker()
@@ -218,25 +221,50 @@ bool FPICOXREyeTracker::GetEyeDirectionToFoveationRendering(FVector& OutDirectio
 	return false;
 }
 
-bool FPICOXREyeTracker::GetFaceTrackingData(int64 ts, int flags, int64& timestamp, TArray<float>& blendShapeWeight, TArray<float>& reserved)
+bool FPICOXREyeTracker::GetFaceTrackingData(int64 inTimeStamp, int64& outTimeStamp, TArray<float>& blendShapeWeight, TArray<float>& videoInputValid, float &laughingProb, TArray<float>& emotionProb, TArray<float>& reserved)
 {
-//     if (bFaceTrackingRun)
-//     {
-//         blendShapeWeight.SetNum(52);
-//         reserved.SetNum(16);
-//         int64_t pxrTs = ts;
-// 		int pxrFlags = flags;
-// 		uint64_t* pTimeStamp = (uint64_t*)(&timestamp);
-//         float* pBlendShapeWeight =nullptr;
-//         float* pReserved =nullptr;
-// #if PLATFORM_ANDROID
-// 		Pxr_GetFaceTrackingData(pxrTs, pxrFlags, pTimeStamp, &pBlendShapeWeight, &pReserved);
-// #endif
-//         FMemory::Memcpy(blendShapeWeight.GetData(), pBlendShapeWeight, sizeof(float) * 52);
-//         FMemory::Memcpy(reserved.GetData(), pReserved, sizeof(float) * 16);
-//         return true;
-//     }
-    return false;
+	UPICOXRSettings* Settings = GetMutableDefault<UPICOXRSettings>();
+	if (Settings && bFaceTrackingRun)
+	{
+		int64_t pxrTs = inTimeStamp;
+		int pxrFlags = 0;
+		int BSN = 72;
+#if PLATFORM_ANDROID
+		BSN = BLEND_SHAPE_NUMS;
+		switch (Settings->FaceTrackingMode)
+		{
+		case EPICOXRFaceTrackingMode::Disable:
+			pxrFlags = GetDataType::PXR_GET_FACE_DATA_DEFAULT;
+			break;
+		case EPICOXRFaceTrackingMode::FaceOnly:
+			pxrFlags = GetDataType::PXR_GET_FACE_DATA;
+			break;
+		case EPICOXRFaceTrackingMode::LipsOnly:
+			pxrFlags = GetDataType::PXR_GET_LIP_DATA;
+			break;
+		case EPICOXRFaceTrackingMode::FaceAndLips:
+			pxrFlags = GetDataType::PXR_GET_FACELIP_DATA;
+			break;
+		default:
+			break;
+		}
+#endif
+		blendShapeWeight.SetNum(BSN);
+        videoInputValid.SetNum(10);
+        emotionProb.SetNum(10);
+		reserved.SetNum(128);
+#if PLATFORM_ANDROID
+		Pxr_GetFaceTrackingData(pxrTs, pxrFlags, &faceTrackingData);
+        outTimeStamp = faceTrackingData.timestamp;
+		laughingProb = faceTrackingData.laughingProb;
+		FMemory::Memcpy(blendShapeWeight.GetData(), faceTrackingData.blendShapeWeight, sizeof(float) * BSN);
+		FMemory::Memcpy(videoInputValid.GetData(), faceTrackingData.videoInputValid, sizeof(float) * 10);
+		FMemory::Memcpy(emotionProb.GetData(), faceTrackingData.emotionProb, sizeof(float) * 10);
+		FMemory::Memcpy(reserved.GetData(), faceTrackingData.reserved, sizeof(float) * 128);
+#endif
+		return true;
+	}
+	return false;
 }
 
 bool FPICOXREyeTracker::EnableEyeTracking(bool enable)
@@ -294,39 +322,54 @@ bool FPICOXREyeTracker::EnableEyeTracking(bool enable)
     return false;
 }
 
-bool FPICOXREyeTracker::EnableFaceTracking(bool enable)
+bool FPICOXREyeTracker::EnableFaceTracking(EPICOXRFaceTrackingMode mode)
 {
 	UPICOXRSettings* Settings = GetMutableDefault<UPICOXRSettings>();
 	if (Settings)
 	{
 #if PLATFORM_ANDROID
+		uint32 TargetTrackingMode = CurrentTrackingMode;
+        switch (mode)
+        {
+        case EPICOXRFaceTrackingMode::Disable:
+			TargetTrackingMode &= ~PXR_TRACKING_MODE_FACE_BIT;
+			TargetTrackingMode &= ~PXR_TRACKING_MODE_FACE_LIBSYNC;
+            break;
+        case EPICOXRFaceTrackingMode::FaceOnly:
+            TargetTrackingMode |= PXR_TRACKING_MODE_FACE_BIT;
+            TargetTrackingMode &= ~PXR_TRACKING_MODE_FACE_LIBSYNC;
+            break;
+        case EPICOXRFaceTrackingMode::LipsOnly:
+            TargetTrackingMode &= ~PXR_TRACKING_MODE_FACE_BIT;
+            TargetTrackingMode |= PXR_TRACKING_MODE_FACE_LIBSYNC;
+            break;
+        case EPICOXRFaceTrackingMode::FaceAndLips:
+            TargetTrackingMode |= PXR_TRACKING_MODE_FACE_BIT;
+			TargetTrackingMode |= PXR_TRACKING_MODE_FACE_LIBSYNC;
+            break;
+        default:
+            break;
+        }
 		int CurrentVersion = 0;
 		Pxr_GetConfigInt(PxrConfigType::PXR_API_VERSION, &CurrentVersion);
         if (CurrentVersion >= 0x2000305)
         {
-            uint32 TargetTrackingMode = CurrentTrackingMode;
-            if (enable)
-            {
-                TargetTrackingMode |= PXR_TRACKING_MODE_FACE_BIT;
-            }
-            else
-            {
-                TargetTrackingMode &= ~PXR_TRACKING_MODE_FACE_BIT;
-            }
             if (Pxr_SetTrackingMode(TargetTrackingMode) == 0)
-            {
-                bFaceTrackingRun = enable;
-                CurrentTrackingMode = TargetTrackingMode;
-                Settings->bEnableFaceTracking = enable;
-            	FString FaceTrackingLog=enable? "Enable Succeeded!": "Disable Succeeded!";
-	            UE_LOG(LogHMD, Log, TEXT("FaceTracking:%s"),*FaceTrackingLog);
+			{
+				if (mode==EPICOXRFaceTrackingMode::Disable)
+				{
+                    bFaceTrackingRun = false;
+                }
+                else
+                {
+                    bFaceTrackingRun = true;
+                }
+				CurrentTrackingMode = TargetTrackingMode;
+				UE_LOG(LogHMD, Log, TEXT("Face Tracking Mode:%u"), CurrentTrackingMode);
                 return true;
             }
         }
 #endif
 	}
-	Settings->bEnableFaceTracking = false;
-	FString FaceTrackingLog=enable? "Enable Failed!": "Disable Failed!";
-	UE_LOG(LogHMD, Log, TEXT("FaceTracking:%s"),*FaceTrackingLog);
 	return false;
 }

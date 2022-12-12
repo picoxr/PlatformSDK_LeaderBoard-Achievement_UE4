@@ -10,7 +10,6 @@ DEFINE_LOG_CATEGORY(PicoRoom);
 
 void UPico_Room::InitParams(ppfRoom* InRoomHandle)
 {
-#if PLATFORM_ANDROID
     UE_LOG(PicoRoom, Log, TEXT("Pico room init!"));
     DataStore = NewObject<UPico_DataStore>();
     DataStore->InitParams(ppf_Room_GetDataStore(InRoomHandle));
@@ -83,7 +82,6 @@ void UPico_Room::InitParams(ppfRoom* InRoomHandle)
     default:
         break;
     }
-#endif
 }
 
 UPico_DataStore* UPico_Room::GetDataStore()
@@ -105,12 +103,10 @@ FString UPico_Room::GetDescription()
 {
     return Description;
 }
-#if PLATFORM_ANDROID
 ppfID UPico_Room::GetppfID()
 {
     return ID;
 }
-#endif
 
 FString UPico_Room::GetRoomID()
 {
@@ -123,7 +119,7 @@ bool UPico_Room::GetIsMembershipLocked()
 }
 
 ERoomJoinPolicy UPico_Room::GetJoinPolicy()
-{  
+{
     return RoomJoinPolicy;
 }
 

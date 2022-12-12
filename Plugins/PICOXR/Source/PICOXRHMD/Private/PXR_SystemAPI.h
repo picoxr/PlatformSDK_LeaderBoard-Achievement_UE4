@@ -237,6 +237,17 @@ enum class EControllerKeyEnum : uint8
 	CONTROLLER_KEY_RIGHT_GRIP
 };
 
+UENUM(BlueprintType)
+enum class EControllerPairTimeEnum : uint8
+{
+	DEFAULT                    UMETA(DisplayName = "Default"),
+	FIFTEEN                    UMETA(DisplayName = "15 Seconds"),
+	SIXTY                      UMETA(DisplayName = "60 Seconds"),
+	ONE_HUNDRED_AND_TWENTY     UMETA(DisplayName = "2 Minutes"),
+	SIX_HUNDRED                UMETA(DisplayName = "10 Minutes"),
+	NEVER                      UMETA(DisplayName = "Never")
+};
+
 USTRUCT(BlueprintType)
 struct FWifiDisplayModel
 {
@@ -316,6 +327,8 @@ DECLARE_DYNAMIC_DELEGATE_OneParam(FPICOImportMapsDelegate, bool, Result);
 DECLARE_DYNAMIC_DELEGATE_OneParam(FPICOControlSetAutoConnectWIFIWithErrorCodeDelegate, int32, Result);
 DECLARE_DYNAMIC_DELEGATE_OneParam(FPICOGetSwitchSystemFunctionStatusDelegate, int32, Result);
 DECLARE_DYNAMIC_DELEGATE_OneParam(FPICOCastInitDelegate, ECastInitResult, Result);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FPICOSetControllerPairTimeDelegate, int32, Result);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FPICOGetControllerPairTimeDelegate, EControllerPairTimeEnum, Result);
 
 UCLASS(ClassGroup = (PXRComponent), meta = (BlueprintSpawnableComponent))
 class PICOXRHMD_API UPICOXRSystemAPI : public UActorComponent
@@ -615,5 +628,13 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "PXR|PXRSystemAPI")
 	EPICOCastOptionValueEnum PXR_PICOCastGetOptionOrStatus(EPICOCastOptionOrStatusEnum OptionEnum, int32 Ext);
+
+	static FPICOSetControllerPairTimeDelegate SetControllerPairTimeDelegate;
+	UFUNCTION(BlueprintCallable, Category = "PXR|PXRSystemAPI")
+	void PXR_SetControllerPairTime(FPICOSetControllerPairTimeDelegate InSetControllerPairTimeDelegate, EControllerPairTimeEnum TimeEnum, int32 Ext);
+
+	static FPICOGetControllerPairTimeDelegate GetControllerPairTimeDelegate;
+	UFUNCTION(BlueprintCallable, Category = "PXR|PXRSystemAPI")
+	void PXR_GetControllerPairTime(FPICOGetControllerPairTimeDelegate InGetControllerPairTimeDelegate, int32 Ext);
 };
 

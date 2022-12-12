@@ -38,13 +38,15 @@ class FPicoIAPInterface;
 class FPicoUserInterface;
 class FPicoAssetFileInterface;
 class FPicoSportInterface;
+class FPicoLeaderboardsInterface;
 class FPicoAchievementsInterface;
+class FPicoChallengesInterface;
 
 /// @brief OnlineSubsystemPico class inherited from FOnlineSubsystemImpl(Unreal Engine)
 class ONLINESUBSYSTEMPICO_API FOnlineSubsystemPico : public FOnlineSubsystemImpl
 {
 public:
-	virtual ~FOnlineSubsystemPico() = default;
+    virtual ~FOnlineSubsystemPico() = default;
 
     virtual IOnlineSessionPtr GetSessionInterface() const override;
 
@@ -111,12 +113,16 @@ public:
 
     TSharedPtr<FPicoAchievementsInterface> GetPicoAchievementsInterface() const;
 
-/**
- * Allows for the PicoSDK calls to be used directly with the Delegates in the Pico PSS
- */
+    TSharedPtr<FPicoLeaderboardsInterface> GetPicoLeaderboardsInterface() const;
+
+    TSharedPtr<FPicoChallengesInterface> GetPicoChallengesInterface() const;
+
+    /**
+     * Allows for the PicoSDK calls to be used directly with the Delegates in the Pico PSS
+     */
     void AddAsyncTask(ppfRequest RequestId, FPicoMessageOnCompleteDelegate Delegate);
 
-//    void AddAsyncTask(ppfRequest RequestId, FPicoMessageOnCompleteDelegate Delegate);
+    //    void AddAsyncTask(ppfRequest RequestId, FPicoMessageOnCompleteDelegate Delegate);
 
     FPicoMulticastMessageOnCompleteDelegate& GetOrAddNotify(ppfMessageType MessageType) const;
     void RemoveNotifyDelegate(ppfMessageType MessageType, const FDelegateHandle& Delegate) const;
@@ -138,6 +144,8 @@ private:
 
 #if PLATFORM_WINDOWS
     bool InitWithWindowsPlatform() const;
+
+    bool GetWindowsDebugInfo(FString& OutJsonString, FString& OutLogPath) const;
 #elif PLATFORM_ANDROID
     bool InitWithAndroidPlatform();
 #endif
@@ -168,7 +176,11 @@ private:
 
     FOnlineLeaderboardPicoPtr LeaderboardInterface;
 
+    TSharedPtr<FPicoLeaderboardsInterface> PicoLeaderboardsInterface;
+
     TSharedPtr<FPicoAchievementsInterface> PicoAchievementsInterface;
+
+    TSharedPtr<FPicoChallengesInterface> PicoChallengesInterface;
 
     /** Online async task runnable */
     class FOnlineAsyncTaskManagerPico* OnlineAsyncTaskThreadRunnable;

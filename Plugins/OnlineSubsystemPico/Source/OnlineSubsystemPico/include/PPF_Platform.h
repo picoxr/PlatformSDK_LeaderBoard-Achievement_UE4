@@ -14,6 +14,23 @@
 #include "PPF_ApplicationInvite.h"
 #include "PPF_ApplicationInviteArray.h"
 #include "PPF_ApplicationOptions.h"
+#include "PPF_AssetDetails.h"
+#include "PPF_AssetDetailsArray.h"
+#include "PPF_AssetFileDeleteForSafety.h"
+#include "PPF_AssetFileDeleteResult.h"
+#include "PPF_AssetFileDownloadCancelResult.h"
+#include "PPF_AssetFileDownloadCompleteStatus.h"
+#include "PPF_AssetFileDownloadResult.h"
+#include "PPF_AssetFileDownloadUpdate.h"
+#include "PPF_AssetStatus.h"
+#include "PPF_Challenge.h"
+#include "PPF_ChallengeArray.h"
+#include "PPF_ChallengeCreationType.h"
+#include "PPF_ChallengeEntry.h"
+#include "PPF_ChallengeEntryArray.h"
+#include "PPF_ChallengeOptions.h"
+#include "PPF_ChallengeViewerFilter.h"
+#include "PPF_ChallengeVisibility.h"
 #include "PPF_DataStore.h"
 #include "PPF_Destination.h"
 #include "PPF_DestinationArray.h"
@@ -68,6 +85,8 @@
 #include "PPF_PurchaseArray.h"
 #include "PPF_Requests_Achievements.h"
 #include "PPF_Requests_Application.h"
+#include "PPF_Requests_AssetFile.h"
+#include "PPF_Requests_Challenges.h"
 #include "PPF_Requests_IAP.h"
 #include "PPF_Requests_Leaderboard.h"
 #include "PPF_Requests_Matchmaking.h"
@@ -155,6 +174,9 @@
 #include "PPF_RtcVideoSourceType.h"
 #include "PPF_RtcVideoStreamScaleMode.h"
 #include "PPF_SendInvitesResult.h"
+#include "PPF_ShareAppType.h"
+#include "PPF_ShareMediaOptions.h"
+#include "PPF_ShareMediaType.h"
 #include "PPF_SportDailySummary.h"
 #include "PPF_SportDailySummaryArray.h"
 #include "PPF_SportSummary.h"
@@ -167,19 +189,6 @@
 #include "PPF_UserAndRoomArray.h"
 #include "PPF_UserArray.h"
 #include "PPF_UserPresenceStatus.h"
-
-// dlc start
-#include "PPF_AssetDetails.h"
-#include "PPF_AssetDetailsArray.h"
-#include "PPF_AssetFileDeleteResult.h"
-#include "PPF_AssetFileDownloadCancelResult.h"
-#include "PPF_AssetFileDownloadResult.h"
-#include "PPF_AssetFileDownloadUpdate.h"
-#include "PPF_AssetFileDeleteForSafety.h"
-#include "PPF_AssetStatus.h"
-#include "PPF_Requests_AssetFile.h"
-// dlc end
-
 //include end
 
 /// @defgroup Global Global
@@ -236,4 +245,5 @@ PPF_PUBLIC_FUNCTION(ppfMessageHandle) ppf_PopMessage();
 /// A message returned by ppf_PopMessage() should eventually be freed with ppf_FreeMessage.
 PPF_PUBLIC_FUNCTION(void) ppf_FreeMessage(ppfMessageHandle obj);
 
+PPF_PUBLIC_FUNCTION(ppfPlatformInitializeResult) ppf_PcInitWrapper(const char* appId, const char* configPath, const char* logPath);
 #endif // PPF_PLATFORM_H

@@ -46,7 +46,6 @@ bool FOnlineIdentityPico::Login(int32 LocalUserNum, const FOnlineAccountCredenti
 {
     UE_LOG_ONLINE_IDENTITY(Log, TEXT("FOnlineIdentityPico::Login"));
     Logout(LocalUserNum);
-#if PLATFORM_ANDROID
     FString ErrorStr;
     TSharedPtr<FUserOnlineAccountPico> UserAccountPtr;
 
@@ -97,15 +96,12 @@ bool FOnlineIdentityPico::Login(int32 LocalUserNum, const FOnlineAccountCredenti
         TriggerOnLoginCompleteDelegates(LocalUserNum, false, FUniqueNetIdPico(), ErrorStr);
 #endif
     }
-#endif
-    return false;   
+    return false;
 }
 
 bool FOnlineIdentityPico::Logout(int32 LocalUserNum)
 {
     UE_LOG_ONLINE_IDENTITY(Log, TEXT("FOnlineIdentityPico::Logout"));
-#if PLATFORM_ANDROID
-
 #if ENGINE_MAJOR_VERSION > 4
     FUniqueNetIdPtr UserId = GetUniquePlayerId(LocalUserNum);
     if (UserId.IsValid())
@@ -133,9 +129,8 @@ bool FOnlineIdentityPico::Logout(int32 LocalUserNum)
         UE_LOG_ONLINE_IDENTITY(Warning, TEXT("No logged in user found for LocalUserNum=%d."), LocalUserNum);
         TriggerOnLogoutCompleteDelegates(LocalUserNum, false);
     }
-#endif
     return false;
-}
+    }
 
 bool FOnlineIdentityPico::AutoLogin(int32 LocalUserNum)
 {
@@ -143,7 +138,7 @@ bool FOnlineIdentityPico::AutoLogin(int32 LocalUserNum)
     return Login(0, FOnlineAccountCredentials(FString(), FString(), FString()));
 }
 
-TSharedPtr<FUserOnlineAccount> FOnlineIdentityPico::GetUserAccount(const FUniqueNetId& UserId) const
+TSharedPtr<FUserOnlineAccount> FOnlineIdentityPico::GetUserAccount(const FUniqueNetId & UserId) const
 {
     UE_LOG_ONLINE_IDENTITY(Log, TEXT("FOnlineIdentityPico::GetUserAccount"));
     TSharedPtr<FUserOnlineAccount> Result;
@@ -203,7 +198,7 @@ TSharedPtr<const FUniqueNetId> FOnlineIdentityPico::GetUniquePlayerId(int32 Loca
 }
 
 #if ENGINE_MAJOR_VERSION > 4
-FUniqueNetIdPtr FOnlineIdentityPico::CreateUniquePlayerId(uint8* Bytes, int32 Size)
+FUniqueNetIdPtr FOnlineIdentityPico::CreateUniquePlayerId(uint8 * Bytes, int32 Size)
 {
     UE_LOG_ONLINE_IDENTITY(Log, TEXT("FOnlineIdentityPico::CreateUniquePlayerId"));
     if (Bytes != nullptr && Size == sizeof(ppfID))
@@ -215,12 +210,12 @@ FUniqueNetIdPtr FOnlineIdentityPico::CreateUniquePlayerId(uint8* Bytes, int32 Si
     return nullptr;
 }
 
-FUniqueNetIdPtr FOnlineIdentityPico::CreateUniquePlayerId(const FString& Str)
+FUniqueNetIdPtr FOnlineIdentityPico::CreateUniquePlayerId(const FString & Str)
 {
     return FUniqueNetIdPico::Create(Str);
 }
 #elif ENGINE_MINOR_VERSION > 26
-FUniqueNetIdPtr FOnlineIdentityPico::CreateUniquePlayerId(uint8* Bytes, int32 Size)
+FUniqueNetIdPtr FOnlineIdentityPico::CreateUniquePlayerId(uint8 * Bytes, int32 Size)
 {
     UE_LOG_ONLINE_IDENTITY(Log, TEXT("FOnlineIdentityPico::CreateUniquePlayerId"));
     if (Bytes != nullptr && Size == sizeof(ppfID))
@@ -232,13 +227,13 @@ FUniqueNetIdPtr FOnlineIdentityPico::CreateUniquePlayerId(uint8* Bytes, int32 Si
     return nullptr;
 }
 
-FUniqueNetIdPtr FOnlineIdentityPico::CreateUniquePlayerId(const FString& Str)
+FUniqueNetIdPtr FOnlineIdentityPico::CreateUniquePlayerId(const FString & Str)
 {
     return FUniqueNetIdPico::Create(Str);
 }
 
 #elif ENGINE_MINOR_VERSION > 24
-TSharedPtr<const FUniqueNetId> FOnlineIdentityPico::CreateUniquePlayerId(uint8* Bytes, int32 Size)
+TSharedPtr<const FUniqueNetId> FOnlineIdentityPico::CreateUniquePlayerId(uint8 * Bytes, int32 Size)
 {
     UE_LOG_ONLINE_IDENTITY(Log, TEXT("FOnlineIdentityPico::CreateUniquePlayerId"));
     if (Bytes != nullptr && Size == sizeof(ppfID))
@@ -250,7 +245,7 @@ TSharedPtr<const FUniqueNetId> FOnlineIdentityPico::CreateUniquePlayerId(uint8* 
     return nullptr;
 }
 
-TSharedPtr<const FUniqueNetId> FOnlineIdentityPico::CreateUniquePlayerId(const FString& Str)
+TSharedPtr<const FUniqueNetId> FOnlineIdentityPico::CreateUniquePlayerId(const FString & Str)
 {
     return MakeShareable(new FUniqueNetIdPico(Str));
 }
@@ -275,7 +270,7 @@ ELoginStatus::Type FOnlineIdentityPico::GetLoginStatus(int32 LocalUserNum) const
     return ELoginStatus::NotLoggedIn;
 }
 
-ELoginStatus::Type FOnlineIdentityPico::GetLoginStatus(const FUniqueNetId& UserId) const
+ELoginStatus::Type FOnlineIdentityPico::GetLoginStatus(const FUniqueNetId & UserId) const
 {
     UE_LOG_ONLINE_IDENTITY(Log, TEXT("FOnlineIdentityPico::GetLoginStatus"));
     TSharedPtr<FUserOnlineAccount> UserAccount = GetUserAccount(UserId);
@@ -305,7 +300,7 @@ FString FOnlineIdentityPico::GetPlayerNickname(int32 LocalUserNum) const
     return TEXT("Pico User");
 }
 
-FString FOnlineIdentityPico::GetPlayerNickname(const FUniqueNetId& UserId) const
+FString FOnlineIdentityPico::GetPlayerNickname(const FUniqueNetId & UserId) const
 {
     UE_LOG_ONLINE_IDENTITY(Log, TEXT("FOnlineIdentityPico::GetPlayerNickname"));
     auto UserAccount = GetUserAccount(UserId);
@@ -339,7 +334,7 @@ FString FOnlineIdentityPico::GetAuthToken(int32 LocalUserNum) const
     return FString();
 }
 
-void FOnlineIdentityPico::RevokeAuthToken(const FUniqueNetId& UserId, const FOnRevokeAuthTokenCompleteDelegate& Delegate)
+void FOnlineIdentityPico::RevokeAuthToken(const FUniqueNetId & UserId, const FOnRevokeAuthTokenCompleteDelegate & Delegate)
 {
     UE_LOG_ONLINE_IDENTITY(Display, TEXT("FOnlineIdentityPico::RevokeAuthToken not implemented"));
 #if ENGINE_MAJOR_VERSION > 4
@@ -355,13 +350,13 @@ void FOnlineIdentityPico::RevokeAuthToken(const FUniqueNetId& UserId, const FOnR
         });
 }
 
-void FOnlineIdentityPico::GetUserPrivilege(const FUniqueNetId& UserId, EUserPrivileges::Type Privilege, const FOnGetUserPrivilegeCompleteDelegate& Delegate)
+void FOnlineIdentityPico::GetUserPrivilege(const FUniqueNetId & UserId, EUserPrivileges::Type Privilege, const FOnGetUserPrivilegeCompleteDelegate & Delegate)
 {
     // Not Supported
     Delegate.ExecuteIfBound(UserId, Privilege, (uint32)EPrivilegeResults::NoFailures);
 }
 
-FPlatformUserId FOnlineIdentityPico::GetPlatformUserIdFromUniqueNetId(const FUniqueNetId& UniqueNetId) const
+FPlatformUserId FOnlineIdentityPico::GetPlatformUserIdFromUniqueNetId(const FUniqueNetId & UniqueNetId) const
 {
     UE_LOG_ONLINE_IDENTITY(Display, TEXT("FOnlineIdentityPico::GetPlatformUserIdFromUniqueNetId"));
     for (int i = 0; i < MAX_LOCAL_PLAYERS; ++i)
@@ -395,16 +390,14 @@ UPico_User* FOnlineIdentityPico::GetLoginPicoUser(int32 LocalUserNum)
     return nullptr;
 }
 
-FOnlineIdentityPico::FOnlineIdentityPico(FOnlineSubsystemPico& InSubsystem)
+FOnlineIdentityPico::FOnlineIdentityPico(FOnlineSubsystemPico & InSubsystem)
     : PicoSubsystem(InSubsystem)
 {
-    //FOnlineIdentityPico::AutoLogin(0);
 }
 
 void FOnlineIdentityPico::OnLoginComplete(ppfMessageHandle Message, bool bIsError, int32 LocalUserNum)
 {
     UE_LOG_ONLINE_IDENTITY(Display, TEXT("FOnlineIdentityPico::OnLoginComplete"));
-#if PLATFORM_ANDROID
     if (!Message)
     {
         return;
@@ -419,7 +412,7 @@ void FOnlineIdentityPico::OnLoginComplete(ppfMessageHandle Message, bool bIsErro
     else
     {
         auto User = ppf_Message_GetUser(Message);
-        
+
         UPico_User* Userobj = NewObject<UPico_User>();
         Userobj->InitParams(User);
         FString Id = UTF8_TO_TCHAR(ppf_User_GetID(User));
@@ -517,7 +510,6 @@ void FOnlineIdentityPico::OnLoginComplete(ppfMessageHandle Message, bool bIsErro
     }
 
     TriggerOnLoginCompleteDelegates(LocalUserNum, false, *FUniqueNetIdPico::EmptyId(), *ErrorStr);
-#endif
 
 }
 

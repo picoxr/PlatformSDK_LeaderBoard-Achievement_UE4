@@ -172,7 +172,7 @@ int64 UOnlinePicoSportFunction::ConvertDateTimeToInt64(FDateTime InDateTime)
 FDateTime UOnlinePicoSportFunction::ConvertInt64ToDateTime(int64 InValue)
 {
     // ms
-    FTimespan DiffTicks = FDateTime::Now() - FDateTime::UtcNow();    
+    FTimespan DiffTicks = FDateTime::Now() - FDateTime::UtcNow();
     return FDateTime::FromUnixTimestamp(InValue / 1000) + DiffTicks;
 }
 
@@ -193,7 +193,7 @@ void UPico_SportDailySummary::InitParams(ppfSportDailySummary* ppfSportDailySumm
 
 int64 UPico_SportDailySummary::GetID()
 {
-    return ID; 
+    return ID;
 }
 
 int64 UPico_SportDailySummary::GetDate()
